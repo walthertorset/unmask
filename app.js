@@ -230,6 +230,7 @@ function initExtensionIntegration() {
     fetchDataFromExtension(currentExtensionId);
   } else {
     // Show empty state if no extension connected
+    renderLibrary([]);
     updateEmptyStates();
   }
 
