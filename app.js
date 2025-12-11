@@ -1,7 +1,6 @@
 // ===== DYNAMIC HEADER ANIMATIONS =====
 
-// Animate header elements on load
-document.addEventListener('DOMContentLoaded', function () {
+function initHeaderAnimations() {
   // Add flexIn class to all animated elements after a short delay
   setTimeout(() => {
     // Animate header title
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
       burger.classList.add('flexIn');
     }
   }, 100);
-});
+}
 
 // ===== SCROLL BEHAVIOR FOR HEADER =====
 
@@ -180,9 +179,18 @@ const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
 let currentExtensionId = localStorage.getItem(STORAGE_KEY_EXT_ID) || '';
 let currentHotels = [];
 
+// ===== INITIALIZE ALL FUNCTIONALITY ON PAGE LOAD =====
 document.addEventListener('DOMContentLoaded', function () {
-  initExtensionIntegration();
-  setupMessageListener();
+  console.log('🎯 Page loaded, initializing...');
+
+  // Initialize header animations
+  initHeaderAnimations();
+
+  // Initialize extension integration (only on dashboard page)
+  if (document.getElementById('library')) {
+    initExtensionIntegration();
+    setupMessageListener();
+  }
 });
 
 // Listen for messages from the extension
@@ -216,19 +224,32 @@ function setupMessageListener() {
 }
 
 function initExtensionIntegration() {
+  console.log('🚀 Initializing extension integration...');
+
   const librarySection = document.getElementById('library');
-  if (!librarySection) return;
+  if (!librarySection) {
+    console.warn('⚠️ Library section not found');
+    return;
+  }
 
   const libraryGrid = librarySection.querySelector('.library-grid');
-  if (!libraryGrid) return;
+  if (!libraryGrid) {
+    console.warn('⚠️ Library grid not found');
+    return;
+  }
+
+  console.log('✅ Library section and grid found');
 
   // Create connection UI
   createConnectionUI(librarySection);
+  console.log('✅ Connection UI created');
 
   // If we have an ID, try to fetch data
   if (currentExtensionId) {
+    console.log('🔍 Extension ID found in storage:', currentExtensionId);
     fetchDataFromExtension(currentExtensionId);
   } else {
+    console.log('📭 No extension ID stored, showing empty state');
     // Show empty state if no extension connected
     renderLibrary([]);
     updateEmptyStates();
