@@ -171,7 +171,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // ===== EXTENSION INTEGRATION =====
 
 // Store the extension ID in localStorage for persistence
-const STORAGE_KEY_EXT_ID = 'hotel_truth_extension_id';
+const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
 let currentExtensionId = localStorage.getItem(STORAGE_KEY_EXT_ID) || '';
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -206,7 +206,7 @@ function createConnectionUI(container) {
 
   controlsDiv.innerHTML = `
     <div style="max-width: 500px; margin: 0 auto;">
-      <h3 style="margin-bottom: 10px; font-size: 18px;">Connect to ReviewRadar Extension</h3>
+      <h3 style="margin-bottom: 10px; font-size: 18px;">Connect to Unmask Extension</h3>
       <p style="margin-bottom: 15px; font-size: 14px; color: #666;">
         To see your analyzed hotels, enter the Extension ID found in chrome://extensions.
         <br>Make sure the extension is installed and running.
