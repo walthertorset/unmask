@@ -181,7 +181,7 @@ let currentHotels = [];
 
 // ===== INITIALIZE ALL FUNCTIONALITY ON PAGE LOAD =====
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🎯 Page loaded, initializing...');
+  console.log('Page loaded, initializing...');
 
   // Initialize header animations
   initHeaderAnimations();
@@ -200,11 +200,11 @@ function setupMessageListener() {
     if (event.origin !== window.location.origin) return;
 
     if (event.data.action === 'hotelDataUpdated' && event.data.hotels) {
-      console.log('🔄 Received hotel data update from extension:', event.data.hotels);
+      console.log('Received hotel data update from extension:', event.data.hotels);
       currentHotels = event.data.hotels;
       renderLibrary(currentHotels);
       updateEmptyStates();
-      showMessage('✅ Hotel library updated!', 'green');
+      showMessage('Hotel library updated!', 'green');
     }
   });
 
@@ -212,11 +212,11 @@ function setupMessageListener() {
   if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'hotelDataUpdated' && message.hotels) {
-        console.log('🔄 Received hotel data update from extension via chrome.runtime:', message.hotels);
+        console.log('Received hotel data update from extension via chrome.runtime:', message.hotels);
         currentHotels = message.hotels;
         renderLibrary(currentHotels);
         updateEmptyStates();
-        showMessage('✅ Hotel library updated!', 'green');
+        showMessage('Hotel library updated!', 'green');
         sendResponse({ received: true });
       }
     });
@@ -224,32 +224,32 @@ function setupMessageListener() {
 }
 
 function initExtensionIntegration() {
-  console.log('🚀 Initializing extension integration...');
+  console.log('Initializing extension integration...');
 
   const librarySection = document.getElementById('library');
   if (!librarySection) {
-    console.warn('⚠️ Library section not found');
+    console.warn('Library section not found');
     return;
   }
 
   const libraryGrid = librarySection.querySelector('.library-grid');
   if (!libraryGrid) {
-    console.warn('⚠️ Library grid not found');
+    console.warn('Library grid not found');
     return;
   }
 
-  console.log('✅ Library section and grid found');
+  console.log('Library section and grid found');
 
   // Create connection UI
   createConnectionUI(librarySection);
-  console.log('✅ Connection UI created');
+  console.log('Connection UI created');
 
   // If we have an ID, try to fetch data
   if (currentExtensionId) {
-    console.log('🔍 Extension ID found in storage:', currentExtensionId);
+    console.log('Extension ID found in storage:', currentExtensionId);
     fetchDataFromExtension(currentExtensionId);
   } else {
-    console.log('📭 No extension ID stored, showing empty state');
+    console.log('No extension ID stored, showing empty state');
     // Show empty state if no extension connected
     renderLibrary([]);
     updateEmptyStates();
