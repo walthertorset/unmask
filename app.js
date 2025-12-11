@@ -298,20 +298,41 @@ function createConnectionUI(container) {
   `;
 
   // Insert before the grid
-  // container is the library section, we need to find the .container div inside it
+  // The container parameter is the library section (#library)
+  console.log('createConnectionUI called with:', container);
+  console.log('Container ID:', container.id);
+
+  // We need to insert into the .container div inside it, before the .library-grid
   const containerDiv = container.querySelector('.container');
+  console.log('Found containerDiv:', containerDiv);
+
   if (!containerDiv) {
-    console.error('Could not find .container div');
+    console.error('Could not find .container div inside library section');
     return;
   }
 
   const libraryGrid = containerDiv.querySelector('.library-grid');
+  console.log('Found libraryGrid:', libraryGrid);
+  console.log('libraryGrid parent:', libraryGrid ? libraryGrid.parentNode : 'N/A');
+  console.log('containerDiv:', containerDiv);
+  console.log('Are they the same?', libraryGrid && libraryGrid.parentNode === containerDiv);
+
   if (!libraryGrid) {
-    console.error('Could not find .library-grid');
+    console.error('Could not find .library-grid inside container');
     return;
   }
 
-  containerDiv.insertBefore(controlsDiv, libraryGrid);
+  // Now insert the connection UI before the library grid
+  console.log('About to insert connection UI before library grid');
+  try {
+    containerDiv.insertBefore(controlsDiv, libraryGrid);
+    console.log('✅ Connection UI inserted successfully');
+  } catch (error) {
+    console.error('❌ Error inserting connection UI:', error);
+    console.error('controlsDiv:', controlsDiv);
+    console.error('libraryGrid:', libraryGrid);
+    console.error('containerDiv:', containerDiv);
+  }
 
   // Add event listeners
   const btn = document.getElementById('btn-connect');
