@@ -374,9 +374,12 @@ function fetchDataFromExtension(extensionId) {
   // Send message to extension
   try {
     console.log(`Attempting to contact extension: ${extensionId}`);
+    console.log('Sending message with chrome.runtime.sendMessage...');
 
     // We use the ID to send the message
     chrome.runtime.sendMessage(extensionId, { action: 'getStoredHotels' }, response => {
+      console.log('Received response from extension:', response);
+      console.log('chrome.runtime.lastError:', chrome.runtime.lastError);
 
       // Handle connection errors
       if (chrome.runtime.lastError) {
@@ -400,6 +403,8 @@ function fetchDataFromExtension(extensionId) {
         updateEmptyStates();
       }
     });
+
+    console.log('Message sent, waiting for response...');
   } catch (e) {
     console.error('Error sending message:', e);
     showMessage(`Error: ${e.message}`, 'red');
