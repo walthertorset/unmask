@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HotelTruth - Compare Hotels with AI</title>
+  <meta name="description" content="Compare hotels side-by-side with AI-powered review analysis">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Fraunces:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Your CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header" id="header" data-header-style="dynamic">
+    <div class="header-border"></div>
+    <div class="header-dropshadow"></div>
+
+    <div class="header-inner">
+      <div class="header-background"></div>
+
+      <!-- Desktop Header -->
+      <div class="header-display-desktop">
+        <div class="header-title-nav-wrapper">
+          <!-- Logo/Title -->
+          <div class="header-title" data-animation-role="header-element">
+            <div class="header-title-text">
+              <a href="/" id="site-title">HotelTruth</a>
+            </div>
+          </div>
+
+          <!-- Left Navigation (next to logo) -->
+          <div class="header-nav header-nav-left">
+            <div class="header-nav-wrapper">
+              <nav class="header-nav-list">
+                <div class="header-nav-item">
+                  <a href="#how-it-works" data-animation-role="header-element">How It Works</a>
+                </div>
+                <div class="header-nav-item">
+                  <a href="#library" data-animation-role="header-element">Library</a>
+                </div>
+                <div class="header-nav-item">
+                  <a href="#compare" data-animation-role="header-element">Compare</a>
+                </div>
+                <div class="header-nav-item">
+                  <a href="#about" data-animation-role="header-element">About</a>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Navigation -->
+        <div class="header-actions">
+          <div class="header-actions-action header-actions-action--cta" data-animation-role="header-element">
+            <a href="#" class="cta-button">Get Started</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Header -->
+      <div class="header-display-mobile">
+        <div class="header-title-nav-wrapper">
+          <div class="header-title" data-animation-role="header-element">
+            <div class="header-title-text">
+              <a href="/" id="site-title-mobile">HotelTruth</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Mobile Menu Button -->
+          <div class="header-burger" data-animation-role="header-element">
+            <button class="header-burger-btn burger" aria-label="Toggle Menu">
+              <span class="visually-hidden">Open Menu</span>
+              <div class="burger-box">
+                <div class="burger-inner">
+                  <div class="top-bun"></div>
+                  <div class="patty"></div>
+                  <div class="bottom-bun"></div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Overlay -->
+      <div class="mobile-menu-overlay">
+        <nav class="mobile-nav">
+          <a href="#how-it-works">How It Works</a>
+          <a href="#library">Library</a>
+          <a href="#compare">Compare</a>
+          <a href="#about">About</a>
+          <a href="#" class="mobile-cta">Get Started</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Book Hotels With Confidence</h1>
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1535205148555-bcbbc2a78913?q=80&w=1238&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Hero image">
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Install Extension</h3>
+          <p>Add our Chrome extension to your browser with a single click.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Browse Hotels</h3>
+          <p>Visit any hotel listing site and our AI analyzes thousands of reviews in real-time.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>See True Scores</h3>
+          <p>Get instant insights with our calculated true review scores alongside listed ratings.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Save & Compare</h3>
+          <p>Build your library and compare hotels side-by-side to make informed decisions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Library Section -->
+  <section class="library-section" id="library">
+    <div class="container">
+      <h2 class="section-title">Library</h2>
+      <p class="section-description">Your analyzed hotels appear here. Below are example hotels showing significant deviations between listed review scores and true review scores calculated by our Chrome extension.</p>
+      <div class="library-grid">
+        <article class="hotel-card">
+          <div class="hotel-image">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop" alt="Hotel example">
+          </div>
+          <div class="hotel-content">
+            <h3>Example Hotel A</h3>
+            <div class="hotel-scores">
+              <div class="score-item">
+                <span class="score-label">Listed Score:</span>
+                <span class="score-value">4.8</span>
+              </div>
+              <div class="score-item">
+                <span class="score-label">True Score:</span>
+                <span class="score-value true-score">3.2</span>
+              </div>
+            </div>
+            <p>Significant deviation detected in review analysis.</p>
+          </div>
+        </article>
+
+        <article class="hotel-card">
+          <div class="hotel-image">
+            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&h=400&fit=crop" alt="Hotel example">
+          </div>
+          <div class="hotel-content">
+            <h3>Example Hotel B</h3>
+            <div class="hotel-scores">
+              <div class="score-item">
+                <span class="score-label">Listed Score:</span>
+                <span class="score-value">4.5</span>
+              </div>
+              <div class="score-item">
+                <span class="score-label">True Score:</span>
+                <span class="score-value true-score">4.3</span>
+              </div>
+            </div>
+            <p>Minor deviation detected in review analysis.</p>
+          </div>
+        </article>
+
+        <article class="hotel-card">
+          <div class="hotel-image">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop" alt="Hotel example">
+          </div>
+          <div class="hotel-content">
+            <h3>Example Hotel C</h3>
+            <div class="hotel-scores">
+              <div class="score-item">
+                <span class="score-label">Listed Score:</span>
+                <span class="score-value">4.2</span>
+              </div>
+              <div class="score-item">
+                <span class="score-label">True Score:</span>
+                <span class="score-value true-score">2.9</span>
+              </div>
+            </div>
+            <p>Major deviation detected in review analysis.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compare Section -->
+  <section class="compare-section" id="compare">
+    <div class="container">
+      <h2 class="section-title">Compare Hotels</h2>
+      <p class="section-description">Compare hotels side-by-side to make informed decisions based on true review scores.</p>
+      <div class="compare-container">
+        <div class="compare-column">
+          <div class="compare-placeholder">
+            <h3>Hotel 1</h3>
+            <p>Select a hotel from your library to compare</p>
+          </div>
+        </div>
+        <div class="compare-divider">
+          <span>VS</span>
+        </div>
+        <div class="compare-column">
+          <div class="compare-placeholder">
+            <h3>Hotel 2</h3>
+            <p>Select a hotel from your library to compare</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="about-content">
+        <h2 class="section-title">About HotelTruth</h2>
+        <p>HotelTruth uses advanced AI analysis to reveal the true quality of hotels by analyzing thousands of reviews. Our Chrome extension calculates genuine review scores, helping you book hotels with confidence and avoid misleading ratings.</p>
+        <p>We believe in transparency and empowering travelers with accurate information to make the best accommodation choices.</p>
+      </div>
+      <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1400&h=900&fit=crop" alt="About HotelTruth">
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top-images">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop" alt="Misty landscape">
+        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=400&fit=crop" alt="Italian street">
+        <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&h=400&fit=crop" alt="Hotel room">
+      </div>
+      
+      <div class="footer-content">
+        <div class="footer-column">
+          <h4>About Us</h4>
+          <p>123 Demo Street<br>New York, NY 12345</p>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Contact Us</h4>
+          <p>
+            <a href="mailto:email@example.com">email@example.com</a><br>
+            <a href="tel:5555555555">(555) 555-5555</a>
+          </p>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Follow Us</h4>
+          <p>
+            <a href="#" target="_blank">Instagram</a><br>
+            <a href="#" target="_blank">X (Formerly Twitter)</a><br>
+            <a href="#" target="_blank">Pinterest</a>
+          </p>
+        </div>
+        
+        <div class="footer-column newsletter-column">
+          <h4>Newsletter</h4>
+          <p>Sign up to receive inspiring travel stories, insider tips, and exclusive offers delivered straight to your inbox.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Email Address" required>
+            <button type="submit" class="newsletter-button">Sign Up</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
