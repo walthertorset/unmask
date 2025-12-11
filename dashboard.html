@@ -32,7 +32,7 @@
           <!-- Logo/Title -->
           <div class="header-title" data-animation-role="header-element">
             <div class="header-title-text">
-              <a href="/" id="site-title">Unmask</a>
+              <a href="index.html" id="site-title">Unmask</a>
             </div>
           </div>
 
@@ -41,13 +41,13 @@
             <div class="header-nav-wrapper">
               <nav class="header-nav-list">
                 <div class="header-nav-item">
-                  <a href="#" data-animation-role="header-element">Home</a>
+                  <a href="index.html" data-animation-role="header-element">Home</a>
                 </div>
                 <div class="header-nav-item">
-                  <a href="#how-it-works" data-animation-role="header-element">How It Works</a>
+                  <a href="index.html#how-it-works" data-animation-role="header-element">How It Works</a>
                 </div>
                 <div class="header-nav-item">
-                  <a href="dashboard.html" data-animation-role="header-element">Dashboard</a>
+                  <a href="#" data-animation-role="header-element">Dashboard</a>
                 </div>
               </nav>
             </div>
@@ -57,7 +57,8 @@
         <!-- Right Navigation -->
         <div class="header-actions">
           <div class="header-actions-action header-actions-action--cta" data-animation-role="header-element">
-            <a href="https://chrome.google.com/webstore/detail/placeholder" target="_blank" class="cta-button">Download Extension</a>
+            <a href="https://chrome.google.com/webstore/detail/placeholder" target="_blank" class="cta-button">Download
+              Extension</a>
           </div>
         </div>
       </div>
@@ -67,7 +68,7 @@
         <div class="header-title-nav-wrapper">
           <div class="header-title" data-animation-role="header-element">
             <div class="header-title-text">
-              <a href="/" id="site-title-mobile">Unmask</a>
+              <a href="index.html" id="site-title-mobile">Unmask</a>
             </div>
           </div>
         </div>
@@ -92,80 +93,122 @@
       <!-- Mobile Menu Overlay -->
       <div class="mobile-menu-overlay">
         <nav class="mobile-nav">
-          <a href="#">Home</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="dashboard.html">Dashboard</a>
-          <a href="https://chrome.google.com/webstore/detail/placeholder" target="_blank" class="mobile-cta">Download Extension</a>
+          <a href="index.html">Home</a>
+          <a href="index.html#how-it-works">How It Works</a>
+          <a href="#">Dashboard</a>
+          <a href="https://chrome.google.com/webstore/detail/placeholder" target="_blank" class="mobile-cta">Download
+            Extension</a>
         </nav>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
+  <!-- Dashboard Intro -->
+  <section class="dashboard-intro" style="padding-top: 120px; padding-bottom: 20px; background: #f7fafc;">
     <div class="container">
-      <h1>Book Hotels With Confidence</h1>
-      <p class="hero-slogan" style="font-size: 24px; color: white; margin-bottom: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
-        See the real hotel rating before you book.
+      <h1 style="font-size: 32px; color: #1a202c; margin-bottom: 10px;">Your Dashboard</h1>
+      <p style="color: #4a5568; max-width: 600px;">
+        Manage your analyzed hotels and compare them side-by-side.
+        <br>Make sure the Unmask extension is installed and synced.
       </p>
-      
-      <div class="value-props" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; color: white;">
-        <div style="background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(5px);">
-          ✨ AI-Powered Analysis
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(5px);">
-          🚫 Spot Fake Reviews
-        </div>
-        <div style="background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(5px);">
-          ✅ True Scores
-        </div>
-      </div>
+    </div>
+  </section>
 
-      <div class="hero-image">
-        <img
-          src="https://images.unsplash.com/photo-1535205148555-bcbbc2a78913?q=80&w=1238&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Hero image">
+  <!-- Library Section -->
+  <section class="library-section" id="library">
+    <div class="container">
+      <h2 class="section-title">Library</h2>
+      <p class="section-description">Your analyzed hotels appear here. Below are example hotels showing significant
+        deviations between listed review scores and true review scores calculated by our Chrome extension.</p>
+      <div class="library-grid">
+        <article class="hotel-card">
+          <div class="hotel-image">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop"
+              alt="Hotel example">
+          </div>
+          <div class="hotel-content">
+            <h3>Example Hotel A</h3>
+            <div class="hotel-scores">
+              <div class="score-item">
+                <span class="score-label">Listed Score:</span>
+                <span class="score-value">4.8</span>
+              </div>
+              <div class="score-item">
+                <span class="score-label">True Score:</span>
+                <span class="score-value true-score">3.2</span>
+              </div>
+            </div>
+            <p>Significant deviation detected in review analysis.</p>
+          </div>
+        </article>
+
+        <article class="hotel-card">
+          <div class="hotel-image">
+            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600&h=400&fit=crop"
+              alt="Hotel example">
+          </div>
+          <div class="hotel-content">
+            <h3>Example Hotel B</h3>
+            <div class="hotel-scores">
+              <div class="score-item">
+                <span class="score-label">Listed Score:</span>
+                <span class="score-value">4.5</span>
+              </div>
+              <div class="score-item">
+                <span class="score-label">True Score:</span>
+                <span class="score-value true-score">4.3</span>
+              </div>
+            </div>
+            <p>Minor deviation detected in review analysis.</p>
+          </div>
+        </article>
+
+        <article class="hotel-card">
+          <div class="hotel-image">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop"
+              alt="Hotel example">
+          </div>
+          <div class="hotel-content">
+            <h3>Example Hotel C</h3>
+            <div class="hotel-scores">
+              <div class="score-item">
+                <span class="score-label">Listed Score:</span>
+                <span class="score-value">4.2</span>
+              </div>
+              <div class="score-item">
+                <span class="score-label">True Score:</span>
+                <span class="score-value true-score">2.9</span>
+              </div>
+            </div>
+            <p>Major deviation detected in review analysis.</p>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- How It Works Section -->
-  <section class="how-it-works-section" id="how-it-works">
+  <!-- Compare Section -->
+  <section class="compare-section" id="compare">
     <div class="container">
-      <h2 class="section-title">How It Works</h2>
-      <p style="text-align: center; max-width: 600px; margin: 0 auto 40px; color: #4a5568;">
-        Unmask runs quietly in your browser, automatically analyzing reviews when you visit hotel booking sites.
+      <h2 class="section-title">Compare Hotels</h2>
+      <p class="section-description">Compare hotels side-by-side to make informed decisions based on true review scores.
       </p>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-number">1</div>
-          <h3>Install Extension</h3>
-          <p>Add our Chrome extension to your browser with a single click. It's free and lightweight.</p>
+      <div class="compare-container">
+        <div class="compare-column">
+          <div class="compare-placeholder">
+            <h3>Hotel 1</h3>
+            <p>Select a hotel from your library to compare</p>
+          </div>
         </div>
-
-        <div class="step-card">
-          <div class="step-number">2</div>
-          <h3>Browse Hotels</h3>
-          <p>Visit Booking.com and browse as normal. Our AI analyzes thousands of reviews in the background.</p>
+        <div class="compare-divider">
+          <span>VS</span>
         </div>
-
-        <div class="step-card">
-          <div class="step-number">3</div>
-          <h3>See True Scores</h3>
-          <p>We reveal the "True Score" next to the listed rating, flagging inflated scores and fake reviews.</p>
+        <div class="compare-column">
+          <div class="compare-placeholder">
+            <h3>Hotel 2</h3>
+            <p>Select a hotel from your library to compare</p>
+          </div>
         </div>
-
-        <div class="step-card">
-          <div class="step-number">4</div>
-          <h3>Dashboard</h3>
-          <p>Save interesting hotels to your personal Dashboard to compare them side-by-side.</p>
-        </div>
-      </div>
-      
-      <div style="text-align: center; margin-top: 60px;">
-        <a href="https://chrome.google.com/webstore/detail/placeholder" target="_blank" class="cta-button" style="font-size: 18px; padding: 15px 40px;">
-          Add to Chrome - It's Free
-        </a>
       </div>
     </div>
   </section>

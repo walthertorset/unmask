@@ -143,27 +143,32 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     // Don't prevent default for empty hash or just #
     if (href === '#' || href === '/#') return;
 
-    e.preventDefault();
-
-    // Remove leading / if present (for links like /#news)
+    // Remove leading / if present
     const cleanHref = href.replace(/^\/#/, '#');
-    const target = document.querySelector(cleanHref);
 
-    if (target) {
-      const headerHeight = header.offsetHeight;
-      const targetPosition = target.offsetTop - headerHeight - 20;
+    // Check if target exists on this page
+    try {
+      const target = document.querySelector(cleanHref);
+      if (target) {
+        e.preventDefault();
+        const headerHeight = header.offsetHeight;
+        const targetPosition = target.offsetTop - headerHeight - 20;
 
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'smooth'
-      });
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
 
-      // Close mobile menu if open
-      if (burgerBtn && mobileMenuOverlay) {
-        burgerBtn.classList.remove('active');
-        mobileMenuOverlay.classList.remove('active');
-        document.body.style.overflow = '';
+        // Close mobile menu if open
+        if (burgerBtn && mobileMenuOverlay) {
+          burgerBtn.classList.remove('active');
+          mobileMenuOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
       }
+      // If target doesn't exist, let the browser handle the link (likely navigation to another page)
+    } catch (err) {
+      // Ignore invalid selectors
     }
   });
 });
