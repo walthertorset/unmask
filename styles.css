@@ -203,11 +203,27 @@ img {
   font-weight: 400;
   letter-spacing: 0.3px;
   transition: color 0.2s, opacity 0.2s;
+  position: relative;
 }
 
 .header-nav-item a:hover {
   color: var(--color-primary);
   opacity: 0.8;
+}
+
+.header-nav-item a.active {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.header-nav-item a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-primary);
 }
 
 .header-actions {
@@ -334,9 +350,15 @@ img {
   padding: var(--spacing-sm) 0;
   border-bottom: 1px solid var(--color-border);
   transition: color 0.2s;
+  text-decoration: none;
 }
 
 .mobile-nav a:hover {
+  color: var(--color-primary);
+}
+
+.mobile-nav a.active {
+  font-weight: 600;
   color: var(--color-primary);
 }
 
