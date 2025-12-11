@@ -247,16 +247,16 @@ function initExtensionIntegration() {
   // If we have an ID, try to fetch data
   if (currentExtensionId) {
     console.log('Extension ID found in storage:', currentExtensionId);
+    showMessage('Connecting to extension...', '#009A8E');
     fetchDataFromExtension(currentExtensionId);
   } else {
-    console.log('No extension ID stored, showing empty state');
+    console.log('No extension ID stored, attempting auto-detection');
     // Show empty state if no extension connected
     renderLibrary([]);
     updateEmptyStates();
+    // Try to auto-detect extension ID by attempting connection
+    autoDetectExtension();
   }
-
-  // Try to auto-detect extension ID by attempting connection
-  autoDetectExtension();
 }
 
 function createConnectionUI(container) {
