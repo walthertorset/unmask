@@ -298,8 +298,20 @@ function createConnectionUI(container) {
   `;
 
   // Insert before the grid
-  const libraryGrid = container.querySelector('.library-grid');
-  container.insertBefore(controlsDiv, libraryGrid);
+  // container is the library section, we need to find the .container div inside it
+  const containerDiv = container.querySelector('.container');
+  if (!containerDiv) {
+    console.error('Could not find .container div');
+    return;
+  }
+
+  const libraryGrid = containerDiv.querySelector('.library-grid');
+  if (!libraryGrid) {
+    console.error('Could not find .library-grid');
+    return;
+  }
+
+  containerDiv.insertBefore(controlsDiv, libraryGrid);
 
   // Add event listeners
   const btn = document.getElementById('btn-connect');
