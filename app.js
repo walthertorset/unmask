@@ -178,10 +178,42 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // Store the extension ID in localStorage for persistence
 const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
 let currentExtensionId = localStorage.getItem(STORAGE_KEY_EXT_ID) || '';
+let currentHotels = [];
 
 document.addEventListener('DOMContentLoaded', function () {
   initExtensionIntegration();
+  setupMessageListener();
 });
+
+// Listen for messages from the extension
+function setupMessageListener() {
+  window.addEventListener('message', function (event) {
+    // Only accept messages from same origin for security
+    if (event.origin !== window.location.origin) return;
+
+    if (event.data.action === 'hotelDataUpdated' && event.data.hotels) {
+      console.log('🔄 Received hotel data update from extension:', event.data.hotels);
+      currentHotels = event.data.hotels;
+      renderLibrary(currentHotels);
+      updateEmptyStates();
+      showMessage('✅ Hotel library updated!', 'green');
+    }
+  });
+
+  // Also listen for chrome runtime messages (if available)
+  if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'hotelDataUpdated' && message.hotels) {
+        console.log('🔄 Received hotel data update from extension via chrome.runtime:', message.hotels);
+        currentHotels = message.hotels;
+        renderLibrary(currentHotels);
+        updateEmptyStates();
+        showMessage('✅ Hotel library updated!', 'green');
+        sendResponse({ received: true });
+      }
+    });
+  }
+}
 
 function initExtensionIntegration() {
   const librarySection = document.getElementById('library');
@@ -190,13 +222,19 @@ function initExtensionIntegration() {
   const libraryGrid = librarySection.querySelector('.library-grid');
   if (!libraryGrid) return;
 
-  // Create connection UI if no ID is set or if we want to allow changing it
+  // Create connection UI
   createConnectionUI(librarySection);
 
   // If we have an ID, try to fetch data
   if (currentExtensionId) {
     fetchDataFromExtension(currentExtensionId);
+  } else {
+    // Show empty state if no extension connected
+    updateEmptyStates();
   }
+
+  // Try to auto-detect extension ID by attempting connection
+  autoDetectExtension();
 }
 
 function createConnectionUI(container) {
@@ -205,23 +243,35 @@ function createConnectionUI(container) {
   controlsDiv.style.marginBottom = '20px';
   controlsDiv.style.textAlign = 'center';
   controlsDiv.style.padding = '20px';
-  controlsDiv.style.background = '#f8f9fa';
+  controlsDiv.style.background = '#f7fafc';
   controlsDiv.style.borderRadius = '8px';
   controlsDiv.style.marginTop = '20px';
+  controlsDiv.style.border = '1px solid #e2e8f0';
 
   controlsDiv.innerHTML = `
-    <div style="max-width: 500px; margin: 0 auto;">
-      <h3 style="margin-bottom: 10px; font-size: 18px;">Connect to Unmask Extension</h3>
-      <p style="margin-bottom: 15px; font-size: 14px; color: #666;">
-        To see your analyzed hotels, enter the Extension ID found in chrome://extensions.
-        <br>Make sure the extension is installed and running.
+    <div style="max-width: 600px; margin: 0 auto;">
+      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748;">🔗 Extension Connection</h3>
+      <p style="margin-bottom: 15px; font-size: 14px; color: #4a5568; line-height: 1.6;">
+        To sync your analyzed hotels, enter your Extension ID from <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 3px;">chrome://extensions</code>
       </p>
-      <div style="display: flex; gap: 10px; justify-content: center;">
-        <input type="text" id="ext-id-input" placeholder="e.g. abcdefghijklmnop..." value="${currentExtensionId}" 
-          style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1; font-family: monospace;">
-        <button id="btn-connect" class="cta-button" style="padding: 10px 20px; font-size: 14px; background: #009A8E; color: white; border: none; border-radius: 4px; cursor: pointer;">Sync Data</button>
+      <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 10px;">
+        <input type="text" id="ext-id-input" placeholder="Extension ID (e.g., abcdefghijklmnop...)" value="${currentExtensionId}"
+          style="padding: 12px; border: 2px solid #cbd5e0; border-radius: 6px; flex: 1; font-family: monospace; font-size: 13px;">
+        <button id="btn-connect" style="padding: 12px 24px; font-size: 14px; background: #009A8E; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background='#007d73'" onmouseout="this.style.background='#009A8E'">
+          🔄 Sync Now
+        </button>
       </div>
-      <div id="connection-status" style="margin-top: 10px; font-size: 14px; min-height: 20px;"></div>
+      <div id="connection-status" style="margin-top: 12px; font-size: 14px; min-height: 24px; font-weight: 500;"></div>
+      <details style="margin-top: 15px; text-align: left; font-size: 13px; color: #718096;">
+        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 8px;">📖 How to find your Extension ID</summary>
+        <ol style="line-height: 1.8; padding-left: 20px; margin-top: 10px;">
+          <li>Open Chrome and go to <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 3px;">chrome://extensions</code></li>
+          <li>Enable "Developer mode" (toggle in top right)</li>
+          <li>Find "Unmask" extension in the list</li>
+          <li>Copy the ID shown below the extension name</li>
+          <li>Paste it in the field above and click "Sync Now"</li>
+        </ol>
+      </details>
     </div>
   `;
 
@@ -237,14 +287,21 @@ function createConnectionUI(container) {
     btn.addEventListener('click', () => {
       const newId = input.value.trim();
       if (!newId) {
-        showMessage('Please enter an Extension ID', 'red');
+        showMessage('⚠️ Please enter an Extension ID', 'orange');
         return;
       }
 
       currentExtensionId = newId;
       localStorage.setItem(STORAGE_KEY_EXT_ID, newId);
-      showMessage('Connecting...', 'blue');
+      showMessage('🔄 Connecting...', '#009A8E');
       fetchDataFromExtension(newId);
+    });
+
+    // Allow Enter key to trigger sync
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        btn.click();
+      }
     });
   }
 }
@@ -257,16 +314,21 @@ function showMessage(msg, color) {
   }
 }
 
+function autoDetectExtension() {
+  // This function could try common extension IDs or use a manifest approach
+  // For now, just a placeholder for future enhancement
+  console.log('Auto-detection would run here if we had a known extension ID');
+}
+
 function fetchDataFromExtension(extensionId) {
   if (!window.chrome || !window.chrome.runtime) {
-    // If not in a chrome environment with runtime access, we might be limited
-    // But typically usually chrome extensions expose this to pages matching externally_connectable
-    console.warn('chrome.runtime not detected immediately. It might be available if using externally_connectable matches.');
+    showMessage('⚠️ Chrome extension API not available. Are you using Chrome?', 'orange');
+    return;
   }
 
   // Send message to extension
   try {
-    console.log(`Attempting to contact extension: ${extensionId}`);
+    console.log(`🔍 Attempting to contact extension: ${extensionId}`);
 
     // We use the ID to send the message
     chrome.runtime.sendMessage(extensionId, { action: 'getStoredHotels' }, response => {
@@ -274,22 +336,29 @@ function fetchDataFromExtension(extensionId) {
       // Handle connection errors
       if (chrome.runtime.lastError) {
         console.error('Connection error:', chrome.runtime.lastError);
-        showMessage('Connection failed. Verify ID. Is the extension installed?', 'red');
+        showMessage('❌ Connection failed. Please verify the Extension ID.', 'red');
+        updateEmptyStates();
         return;
       }
 
-      if (response && response.hotels) {
-        console.log('Received hotels:', response.hotels);
-        showMessage(`Successfully synced ${response.hotels.length} hotels!`, 'green');
-        renderLibrary(response.hotels);
+      if (response && response.success && response.hotels) {
+        console.log('✅ Received hotels:', response.hotels);
+        currentHotels = response.hotels;
+        showMessage(`✅ Successfully synced ${response.hotels.length} hotel${response.hotels.length !== 1 ? 's' : ''}!`, 'green');
+        renderLibrary(currentHotels);
+        updateEmptyStates();
       } else {
         console.warn('No response or no hotels', response);
-        showMessage('Connected, but received no data.', 'orange');
+        currentHotels = [];
+        showMessage('✅ Connected! No hotels analyzed yet.', '#009A8E');
+        renderLibrary([]);
+        updateEmptyStates();
       }
     });
   } catch (e) {
     console.error('Error sending message:', e);
-    showMessage(`Error: ${e.message}. Are you using Chrome?`, 'red');
+    showMessage(`❌ Error: ${e.message}`, 'red');
+    updateEmptyStates();
   }
 }
 
@@ -298,7 +367,19 @@ function renderLibrary(hotels) {
   if (!grid) return;
 
   if (hotels.length === 0) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fff; border-radius: 8px;">No hotels analyzed yet. Visit booking.com to analyze some hotels!</div>';
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; background: white; border-radius: 12px; border: 2px dashed #cbd5e0;">
+        <div style="font-size: 48px; margin-bottom: 20px;">🏨</div>
+        <h3 style="font-size: 20px; margin-bottom: 15px; color: #2d3748;">No Hotels Analyzed Yet</h3>
+        <p style="color: #718096; margin-bottom: 20px; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto;">
+          Start by visiting <strong>Booking.com</strong> and clicking <strong>"Analyze with Unmask"</strong> on any hotel page.
+          Your analyzed hotels will automatically appear here!
+        </p>
+        <div style="display: inline-block; padding: 12px 24px; background: #e6f7f5; color: #009A8E; border-radius: 8px; font-size: 14px; font-weight: 600;">
+          📍 Hotels sync automatically once you're connected
+        </div>
+      </div>
+    `;
     return;
   }
 
@@ -359,4 +440,18 @@ function getScoreStyle(rating) {
   if (rating >= 8) return 'color: #009A8E; font-weight: bold;';
   if (rating >= 6) return 'color: #d69e2e; font-weight: bold;';
   return 'color: #e53e3e; font-weight: bold;';
+}
+
+// Update empty states for comparison section
+function updateEmptyStates() {
+  const compareEmptyState = document.getElementById('compare-empty-state');
+
+  if (compareEmptyState) {
+    // Show empty state if no hotels available
+    if (currentHotels.length === 0) {
+      compareEmptyState.style.display = 'block';
+    } else {
+      compareEmptyState.style.display = 'none';
+    }
+  }
 }
