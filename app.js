@@ -366,50 +366,52 @@ function autoDetectExtension() {
 }
 
 function fetchDataFromExtension(extensionId) {
-  if (!window.chrome || !window.chrome.runtime) {
-    showMessage('Chrome extension API not available. Are you using Chrome?', 'orange');
-    return;
-  }
+  console.log(`[WEBSITE] Attempting to fetch data from extension: ${extensionId}`);
+  console.log('[WEBSITE] Window origin:', window.location.origin);
 
-  // Send message to extension
-  try {
-    console.log(`Attempting to contact extension: ${extensionId}`);
-    console.log('Sending message with chrome.runtime.sendMessage...');
+  // Set up a listener for the response
+  const responseHandler = function(event) {
+    console.log('[WEBSITE] Received message in responseHandler:', event.data);
+    console.log('[WEBSITE] Message origin:', event.origin);
+    console.log('[WEBSITE] Window origin:', window.location.origin);
 
-    // We use the ID to send the message
-    chrome.runtime.sendMessage(extensionId, { action: 'getStoredHotels' }, response => {
-      console.log('Received response from extension:', response);
-      console.log('chrome.runtime.lastError:', chrome.runtime.lastError);
+    if (event.origin !== window.location.origin) {
+      console.log('[WEBSITE] Ignoring message from different origin');
+      return;
+    }
 
-      // Handle connection errors
-      if (chrome.runtime.lastError) {
-        console.error('Connection error:', chrome.runtime.lastError);
-        showMessage('Connection failed. Extension may not be installed.', 'red');
-        updateEmptyStates();
-        return;
-      }
+    if (event.data && event.data.action === 'getStoredHotelsResponse') {
+      console.log('[WEBSITE] Received hotels response:', event.data);
+      window.removeEventListener('message', responseHandler);
 
-      if (response && response.success && response.hotels) {
-        console.log('Received hotels:', response.hotels);
-        currentHotels = response.hotels;
-        showMessage(`Successfully synced ${response.hotels.length} hotel${response.hotels.length !== 1 ? 's' : ''}!`, 'green');
+      if (event.data.success && event.data.hotels) {
+        currentHotels = event.data.hotels;
+        showMessage(`Successfully synced ${event.data.hotels.length} hotel${event.data.hotels.length !== 1 ? 's' : ''}!`, 'green');
         renderLibrary(currentHotels);
         updateEmptyStates();
       } else {
-        console.warn('No response or no hotels', response);
         currentHotels = [];
         showMessage('Connected! No hotels analyzed yet.', '#009A8E');
         renderLibrary([]);
         updateEmptyStates();
       }
-    });
+    }
+  };
 
-    console.log('Message sent, waiting for response...');
-  } catch (e) {
-    console.error('Error sending message:', e);
-    showMessage(`Error: ${e.message}`, 'red');
-    updateEmptyStates();
-  }
+  console.log('[WEBSITE] Adding message listener for response');
+  window.addEventListener('message', responseHandler);
+
+  // Set a timeout in case the extension doesn't respond
+  setTimeout(() => {
+    console.log('[WEBSITE] Timeout reached, removing listener');
+    window.removeEventListener('message', responseHandler);
+  }, 5000);
+
+  // Send the request via postMessage to the content script
+  console.log('[WEBSITE] Sending getStoredHotels request via postMessage');
+  console.log('[WEBSITE] Message payload:', { action: 'getStoredHotels' });
+  window.postMessage({ action: 'getStoredHotels' }, '*');
+  console.log('[WEBSITE] Message sent');
 }
 
 function renderLibrary(hotels) {
