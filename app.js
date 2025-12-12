@@ -370,7 +370,7 @@ function fetchDataFromExtension(extensionId) {
   console.log('[WEBSITE] Window origin:', window.location.origin);
 
   // Set up a listener for the response
-  const responseHandler = function(event) {
+  const responseHandler = function (event) {
     console.log('[WEBSITE] Received message in responseHandler:', event.data);
     console.log('[WEBSITE] Message origin:', event.origin);
     console.log('[WEBSITE] Window origin:', window.location.origin);
@@ -524,7 +524,7 @@ function renderLibrary(hotels) {
         <div class="hotel-scores" style="margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
           <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
             <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Listed Score</div>
-            <div style="font-size: 16px; font-weight: bold;">${hotel.originalRating}</div>
+            <div style="font-size: 16px; font-weight: bold;">${Number(hotel.originalRating).toFixed(1)}</div>
           </div>
           <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
             <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">True Score</div>
@@ -552,7 +552,7 @@ function renderLibrary(hotels) {
         </div>
 
         <a href="${hotel.url}" target="_blank" style="display: block; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s;">
-          View on Booking.com
+          View on ${getOTAName(hotel.url)}
         </a>
       </div>
     </article>
@@ -751,7 +751,7 @@ function populateCompareSlot(slotId, hotel) {
       <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 6px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span style="color: #4a5568; font-size: 14px;">Listed Score:</span>
-          <span style="font-weight: bold; font-size: 16px;">${hotel.originalRating}</span>
+          <span style="font-weight: bold; font-size: 16px;">${Number(hotel.originalRating).toFixed(1)}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span style="color: #4a5568; font-size: 14px;">True Score:</span>
@@ -803,6 +803,14 @@ function cleanHotelName(rawName) {
 
   return cleaned.trim();
 }
+
+function getOTAName(url) {
+  if (url.includes('booking.com')) return 'Booking.com';
+  if (url.includes('expedia')) return 'Expedia';
+  if (url.includes('hotels.com')) return 'Hotels.com';
+  return 'Booking Site';
+}
+
 
 function getScoreStyle(rating) {
   if (rating >= 8) return 'color: #009A8E; font-weight: bold;';
