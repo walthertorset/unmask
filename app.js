@@ -442,6 +442,10 @@ function renderLibrary(hotels) {
   if (!grid) return;
 
   if (hotels.length === 0) {
+    // Hide selection controls when no hotels
+    const selectionControls = document.getElementById('selection-controls');
+    if (selectionControls) selectionControls.style.display = 'none';
+
     grid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; background: white; border-radius: 12px; border: 2px dashed #cbd5e0;">
         <h3 style="font-size: 20px; margin-bottom: 15px; color: #2d3748;">No Hotels Analyzed Yet</h3>
@@ -456,6 +460,9 @@ function renderLibrary(hotels) {
     `;
     return;
   }
+
+  // Show selection controls when hotels exist
+  renderSelectionControls();
 
   grid.innerHTML = hotels.map(hotel => {
     // Calculate deviation status
@@ -479,9 +486,12 @@ function renderLibrary(hotels) {
       : `<span style="font-size: 40px;">🏨</span>`;
 
     return `
-    <article class="hotel-card">
+    <article class="hotel-card" data-hotel-id="${hotel.hotelId}">
       <div class="hotel-image" style="background-color: #e2e8f0; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
         ${imageHTML}
+        <div style="position: absolute; top: 10px; left: 10px;">
+          <input type="checkbox" class="hotel-checkbox" data-hotel-id="${hotel.hotelId}" style="width: 20px; height: 20px; cursor: pointer;">
+        </div>
         <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 12px;">
            ${hotel.location || 'Unknown Location'}
         </div>
@@ -515,6 +525,226 @@ function renderLibrary(hotels) {
     </article>
     `;
   }).join('');
+
+  // Add event listeners to checkboxes
+  attachCheckboxListeners();
+}
+
+function renderSelectionControls() {
+  // Check if controls already exist
+  let controlsDiv = document.getElementById('selection-controls');
+
+  if (!controlsDiv) {
+    // Create controls div
+    controlsDiv = document.createElement('div');
+    controlsDiv.id = 'selection-controls';
+    controlsDiv.style.cssText = 'margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;';
+
+    controlsDiv.innerHTML = `
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+        <input type="checkbox" id="select-all-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+        <span>Select All</span>
+      </label>
+      <div style="flex: 1;"></div>
+      <span id="selected-count" style="color: #4a5568; font-size: 14px;">0 selected</span>
+      <button id="compare-selected-btn" style="padding: 8px 16px; background: #009A8E; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; opacity: 0.5; pointer-events: none;" disabled>
+        Compare Selected
+      </button>
+      <button id="delete-selected-btn" style="padding: 8px 16px; background: #e53e3e; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; opacity: 0.5; pointer-events: none;" disabled>
+        Delete Selected
+      </button>
+    `;
+
+    // Insert before the library grid
+    const librarySection = document.getElementById('library');
+    const container = librarySection.querySelector('.container');
+    const grid = container.querySelector('.library-grid');
+    container.insertBefore(controlsDiv, grid);
+  }
+
+  // Show the controls
+  controlsDiv.style.display = 'flex';
+
+  // Attach event listeners
+  attachControlListeners();
+}
+
+function attachCheckboxListeners() {
+  const checkboxes = document.querySelectorAll('.hotel-checkbox');
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateSelectionState);
+  });
+}
+
+function attachControlListeners() {
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  const compareBtn = document.getElementById('compare-selected-btn');
+  const deleteBtn = document.getElementById('delete-selected-btn');
+
+  if (selectAllCheckbox) {
+    selectAllCheckbox.removeEventListener('change', toggleSelectAll);
+    selectAllCheckbox.addEventListener('change', toggleSelectAll);
+  }
+
+  if (compareBtn) {
+    compareBtn.removeEventListener('click', compareSelected);
+    compareBtn.addEventListener('click', compareSelected);
+  }
+
+  if (deleteBtn) {
+    deleteBtn.removeEventListener('click', deleteSelected);
+    deleteBtn.addEventListener('click', deleteSelected);
+  }
+}
+
+function toggleSelectAll(e) {
+  const checkboxes = document.querySelectorAll('.hotel-checkbox');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = e.target.checked;
+  });
+  updateSelectionState();
+}
+
+function updateSelectionState() {
+  const checkboxes = document.querySelectorAll('.hotel-checkbox');
+  const checkedBoxes = document.querySelectorAll('.hotel-checkbox:checked');
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  const selectedCount = document.getElementById('selected-count');
+  const compareBtn = document.getElementById('compare-selected-btn');
+  const deleteBtn = document.getElementById('delete-selected-btn');
+
+  // Update select all checkbox state
+  if (selectAllCheckbox) {
+    selectAllCheckbox.checked = checkboxes.length > 0 && checkedBoxes.length === checkboxes.length;
+    selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+  }
+
+  // Update count
+  if (selectedCount) {
+    selectedCount.textContent = `${checkedBoxes.length} selected`;
+  }
+
+  // Update button states
+  const hasSelection = checkedBoxes.length > 0;
+  const canCompare = checkedBoxes.length === 2;
+
+  if (compareBtn) {
+    compareBtn.disabled = !canCompare;
+    compareBtn.style.opacity = canCompare ? '1' : '0.5';
+    compareBtn.style.pointerEvents = canCompare ? 'auto' : 'none';
+  }
+
+  if (deleteBtn) {
+    deleteBtn.disabled = !hasSelection;
+    deleteBtn.style.opacity = hasSelection ? '1' : '0.5';
+    deleteBtn.style.pointerEvents = hasSelection ? 'auto' : 'none';
+  }
+}
+
+function compareSelected() {
+  const checkedBoxes = document.querySelectorAll('.hotel-checkbox:checked');
+  if (checkedBoxes.length !== 2) {
+    alert('Please select exactly 2 hotels to compare');
+    return;
+  }
+
+  const hotelIds = Array.from(checkedBoxes).map(cb => cb.dataset.hotelId);
+  const hotel1 = currentHotels.find(h => h.hotelId === hotelIds[0]);
+  const hotel2 = currentHotels.find(h => h.hotelId === hotelIds[1]);
+
+  if (hotel1 && hotel2) {
+    // Populate comparison slots
+    populateCompareSlot('compare-slot-1', hotel1);
+    populateCompareSlot('compare-slot-2', hotel2);
+
+    // Scroll to comparison section
+    document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function deleteSelected() {
+  const checkedBoxes = document.querySelectorAll('.hotel-checkbox:checked');
+  if (checkedBoxes.length === 0) return;
+
+  const count = checkedBoxes.length;
+  const confirmMsg = `Are you sure you want to delete ${count} hotel${count > 1 ? 's' : ''}?`;
+
+  if (!confirm(confirmMsg)) return;
+
+  const hotelIdsToDelete = Array.from(checkedBoxes).map(cb => cb.dataset.hotelId);
+
+  // Remove from currentHotels array
+  currentHotels = currentHotels.filter(h => !hotelIdsToDelete.includes(h.hotelId));
+
+  // Send message to extension to update storage
+  window.postMessage({
+    action: 'deleteHotels',
+    hotelIds: hotelIdsToDelete
+  }, '*');
+
+  // Re-render library
+  renderLibrary(currentHotels);
+  updateEmptyStates();
+
+  showMessage(`Deleted ${count} hotel${count > 1 ? 's' : ''}`, '#e53e3e');
+}
+
+function populateCompareSlot(slotId, hotel) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+
+  const cleanName = cleanHotelName(hotel.hotelName);
+  const diff = hotel.analysis.adjustedRating - hotel.originalRating;
+  let deviationText = 'Accurate rating';
+  let devColor = '#718096';
+
+  if (diff < -1.0) { deviationText = 'Major rating inflation'; devColor = '#e53e3e'; }
+  else if (diff < -0.5) { deviationText = 'Minor rating inflation'; devColor = '#dd6b20'; }
+  else if (diff > 0.5) { deviationText = 'Better than rated'; devColor = '#38a169'; }
+
+  const imageHTML = hotel.imageUrl
+    ? `<img src="${hotel.imageUrl}" alt="${cleanName}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">`
+    : `<div style="width: 100%; height: 150px; background: #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;">🏨</div>`;
+
+  slot.innerHTML = `
+    <div style="text-align: left;">
+      ${imageHTML}
+      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748;">${cleanName}</h3>
+      <p style="margin-bottom: 8px; font-size: 14px; color: #718096;">📍 ${hotel.location || 'Unknown'}</p>
+
+      <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 6px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span style="color: #4a5568; font-size: 14px;">Listed Score:</span>
+          <span style="font-weight: bold; font-size: 16px;">${hotel.originalRating}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span style="color: #4a5568; font-size: 14px;">True Score:</span>
+          <span style="font-weight: bold; font-size: 16px; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</span>
+        </div>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+          <p style="font-size: 13px; font-style: italic; color: ${devColor};">${deviationText}</p>
+        </div>
+      </div>
+
+      <button onclick="clearCompareSlot('${slotId}')" style="margin-top: 15px; width: 100%; padding: 8px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+        Remove
+      </button>
+    </div>
+  `;
+
+  slot.className = 'compare-filled';
+}
+
+function clearCompareSlot(slotId) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+
+  const slotNumber = slotId === 'compare-slot-1' ? '1' : '2';
+  slot.className = 'compare-placeholder';
+  slot.innerHTML = `
+    <h3>Hotel ${slotNumber}</h3>
+    <p>Select a hotel from your library to compare</p>
+  `;
 }
 
 function cleanHotelName(rawName) {
