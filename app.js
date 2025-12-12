@@ -398,9 +398,9 @@ function fetchDataFromExtension(extensionId) {
         const hotelCount = event.data.hotels.length;
         const hotelText = hotelCount !== 1 ? 'hotels' : 'hotel';
 
-        // Update description to show active status with green checkmark
+        // Update description to show active status with bold green checkmark
         if (libraryDescription) {
-          libraryDescription.textContent = `Extension active ✓. Successfully synced ${hotelCount} ${hotelText}`;
+          libraryDescription.innerHTML = `Extension active <span style="color: #10b981; font-weight: bold;">✓</span> Successfully synced ${hotelCount} ${hotelText}`;
         }
 
         showMessage(`Successfully synced ${hotelCount} ${hotelText}!`, 'green');
@@ -411,7 +411,7 @@ function fetchDataFromExtension(extensionId) {
 
         // Update description for connected but no hotels case
         if (libraryDescription) {
-          libraryDescription.textContent = 'Extension active ✓. Successfully synced 0 hotels';
+          libraryDescription.innerHTML = 'Extension active <span style="color: #10b981; font-weight: bold;">✓</span> Successfully synced 0 hotels';
         }
 
         showMessage('Connected! No hotels analyzed yet.', '#009A8E');
