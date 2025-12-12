@@ -751,11 +751,15 @@ function cleanHotelName(rawName) {
   // Remove common booking.com prefixes/suffixes
   let cleaned = rawName;
 
-  // Remove "tilbud på" or "offers on" prefix
+  // Remove "tilbud på" (Norwegian) or "offers on" (English) prefix
   cleaned = cleaned.replace(/^(tilbud på|offers on)\s+/i, '');
 
-  // Remove everything in parentheses at the end (like "(Ferieanlegg) (Thailand)")
-  cleaned = cleaned.replace(/\s*\([^)]*\)\s*(\([^)]*\))?$/g, '');
+  // Remove "Deals" or "Tilbud" suffix
+  cleaned = cleaned.replace(/\s+(deals|tilbud)\s*$/i, '');
+
+  // Remove everything in parentheses (like "(Resort) (Thailand)" or "(Ferieanlegg)")
+  // This handles multiple parentheses at the end
+  cleaned = cleaned.replace(/(\s*\([^)]*\))+\s*$/g, '');
 
   // Remove trailing content after common separators
   cleaned = cleaned.split(' - ')[0];
