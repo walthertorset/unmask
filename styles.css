@@ -1044,6 +1044,16 @@ img {
     padding: 16px 24px;
   }
 
+  /* Ensure logo is always visible on mobile */
+  .header-title {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  .header-title-text a {
+    font-size: 28px;
+  }
+
   .hero .container {
     padding-top: var(--spacing-lg);
   }
