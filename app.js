@@ -470,17 +470,24 @@ function renderLibrary(hotels) {
     // Safety check for recommendation
     const recText = hotel.analysis.recommendation ? hotel.analysis.recommendation.split('.')[0] + '.' : 'No recommendation available.';
 
+    // Clean hotel name
+    const cleanName = cleanHotelName(hotel.hotelName);
+
+    // Use hotel image if available, otherwise use placeholder
+    const imageHTML = hotel.imageUrl
+      ? `<img src="${hotel.imageUrl}" alt="${cleanName}" style="width: 100%; height: 100%; object-fit: cover;">`
+      : `<span style="font-size: 40px;">🏨</span>`;
+
     return `
     <article class="hotel-card">
       <div class="hotel-image" style="background-color: #e2e8f0; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
-        <!-- Use a generic image/placeholder since specific images aren't stored yet -->
-        <span style="font-size: 40px;">🏨</span>
+        ${imageHTML}
         <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 12px;">
            ${hotel.location || 'Unknown Location'}
         </div>
       </div>
       <div class="hotel-content">
-        <h3 style="margin-bottom: 5px; height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${hotel.hotelName}">${hotel.hotelName}</h3>
+        <h3 style="margin-bottom: 5px; height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cleanName}">${cleanName}</h3>
         
         <div class="hotel-scores" style="margin-top: 15px;">
           <div class="score-item">
@@ -508,6 +515,23 @@ function renderLibrary(hotels) {
     </article>
     `;
   }).join('');
+}
+
+function cleanHotelName(rawName) {
+  // Remove common booking.com prefixes/suffixes
+  let cleaned = rawName;
+
+  // Remove "tilbud på" or "offers on" prefix
+  cleaned = cleaned.replace(/^(tilbud på|offers on)\s+/i, '');
+
+  // Remove everything in parentheses at the end (like "(Ferieanlegg) (Thailand)")
+  cleaned = cleaned.replace(/\s*\([^)]*\)\s*(\([^)]*\))?$/g, '');
+
+  // Remove trailing content after common separators
+  cleaned = cleaned.split(' - ')[0];
+  cleaned = cleaned.split(',')[0];
+
+  return cleaned.trim();
 }
 
 function getScoreStyle(rating) {
