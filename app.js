@@ -806,8 +806,8 @@ function cleanHotelName(rawName) {
 
 function getOTAName(url) {
   if (url.includes('booking.com')) return 'Booking.com';
-  if (url.includes('expedia')) return 'Expedia';
   if (url.includes('hotels.com')) return 'Hotels.com';
+  if (url.includes('expedia')) return 'Expedia';
   return 'Booking Site';
 }
 
