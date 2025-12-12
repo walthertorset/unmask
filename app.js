@@ -494,9 +494,9 @@ function renderLibrary(hotels) {
       ? `${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}`
       : 'Price N/A';
 
-    // Calculate value score (quality per price)
-    const valueScore = hotel.priceData && hotel.priceData.pricePerNight > 0
-      ? (hotel.analysis.adjustedRating / (hotel.priceData.pricePerNight / 100)).toFixed(2)
+    // Get value score from analysis (1-10 scale from AI)
+    const valueScore = hotel.analysis.valueScore
+      ? `${hotel.analysis.valueScore}/10`
       : 'N/A';
 
     // Get trends information
