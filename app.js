@@ -474,9 +474,6 @@ function renderLibrary(hotels) {
     else if (diff < -0.5) { deviationText = 'Minor rating inflation detected'; devColor = '#dd6b20'; }
     else if (diff > 0.5) { deviationText = 'Better than rated'; devColor = '#38a169'; }
 
-    // Safety check for recommendation
-    const recText = hotel.analysis.recommendation ? hotel.analysis.recommendation.split('.')[0] + '.' : 'No recommendation available.';
-
     // Clean hotel name
     const cleanName = cleanHotelName(hotel.hotelName);
 
@@ -485,6 +482,26 @@ function renderLibrary(hotels) {
       ? `<img src="${hotel.imageUrl}" alt="${cleanName}" style="width: 100%; height: 100%; object-fit: cover;">`
       : `<span style="font-size: 40px;">🏨</span>`;
 
+    // Format analyzed date
+    const analyzedDate = hotel.analyzedAt ? new Date(hotel.analyzedAt).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }) : 'Unknown';
+
+    // Format price information
+    const priceInfo = hotel.priceData
+      ? `${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}`
+      : 'Price N/A';
+
+    // Calculate value score (quality per price)
+    const valueScore = hotel.priceData && hotel.priceData.pricePerNight > 0
+      ? (hotel.analysis.adjustedRating / (hotel.priceData.pricePerNight / 100)).toFixed(2)
+      : 'N/A';
+
+    // Get trends information
+    const trendsText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No trend data available';
+
     return `
     <article class="hotel-card" data-hotel-id="${hotel.hotelId}">
       <div class="hotel-image" style="background-color: #e2e8f0; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
@@ -492,33 +509,49 @@ function renderLibrary(hotels) {
         <div style="position: absolute; top: 10px; left: 10px;">
           <input type="checkbox" class="hotel-checkbox" data-hotel-id="${hotel.hotelId}" style="width: 20px; height: 20px; cursor: pointer;">
         </div>
-        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; font-size: 12px;">
-           ${hotel.location || 'Unknown Location'}
-        </div>
       </div>
       <div class="hotel-content">
-        <h3 style="margin-bottom: 5px; height: 1.4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cleanName}">${cleanName}</h3>
-        
-        <div class="hotel-scores" style="margin-top: 15px;">
-          <div class="score-item">
-            <span class="score-label">Listed Score:</span>
-            <span class="score-value">${hotel.originalRating}</span>
+        <h3 style="margin-bottom: 8px; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cleanName}">${cleanName}</h3>
+
+        <div style="font-size: 13px; color: #718096; margin-bottom: 4px;">
+          <span style="margin-right: 4px;">📍</span>${hotel.location || 'Unknown Location'}
+        </div>
+
+        <div style="font-size: 12px; color: #a0aec0; margin-bottom: 12px;">
+          Analyzed: ${analyzedDate}
+        </div>
+
+        <div class="hotel-scores" style="margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
+            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Listed Score</div>
+            <div style="font-size: 16px; font-weight: bold;">${hotel.originalRating}</div>
           </div>
-          <div class="score-item">
-            <span class="score-label">True Score:</span>
-            <span class="score-value true-score" style="${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</span>
+          <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
+            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">True Score</div>
+            <div style="font-size: 16px; font-weight: bold; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</div>
           </div>
         </div>
-        
-        <p class="deviation-text" style="font-size: 13px; margin-top: 10px; font-style: italic; color: ${devColor};">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
+            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Price/Night</div>
+            <div style="font-size: 14px; font-weight: 600;">${priceInfo}</div>
+          </div>
+          <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
+            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Value Score</div>
+            <div style="font-size: 14px; font-weight: 600; color: #009A8E;">${valueScore}</div>
+          </div>
+        </div>
+
+        <p class="deviation-text" style="font-size: 12px; margin-bottom: 8px; font-style: italic; color: ${devColor};">
           ${deviationText}
         </p>
-        
-        <div style="margin-top: 15px; background: #f7fafc; padding: 8px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #4a5568;">
-           "${recText}"
+
+        <div style="margin-bottom: 12px; background: #f7fafc; padding: 8px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #4a5568; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${trendsText}">
+          <strong>Trend:</strong> ${trendsText}
         </div>
-        
-        <a href="${hotel.url}" target="_blank" style="display: block; margin-top: 15px; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s;">
+
+        <a href="${hotel.url}" target="_blank" style="display: block; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s;">
           View on Booking.com
         </a>
       </div>
