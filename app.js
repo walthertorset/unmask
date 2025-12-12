@@ -626,7 +626,7 @@ function updateSelectionState() {
 
   // Update button states
   const hasSelection = checkedBoxes.length > 0;
-  const canCompare = checkedBoxes.length === 2;
+  const canCompare = checkedBoxes.length >= 2 && checkedBoxes.length <= 3;
 
   if (compareBtn) {
     compareBtn.disabled = !canCompare;
@@ -643,23 +643,26 @@ function updateSelectionState() {
 
 function compareSelected() {
   const checkedBoxes = document.querySelectorAll('.hotel-checkbox:checked');
-  if (checkedBoxes.length !== 2) {
-    alert('Please select exactly 2 hotels to compare');
+  if (checkedBoxes.length < 2 || checkedBoxes.length > 3) {
+    alert('Please select 2-3 hotels to compare');
     return;
   }
 
   const hotelIds = Array.from(checkedBoxes).map(cb => cb.dataset.hotelId);
-  const hotel1 = currentHotels.find(h => h.hotelId === hotelIds[0]);
-  const hotel2 = currentHotels.find(h => h.hotelId === hotelIds[1]);
+  const hotels = hotelIds.map(id => currentHotels.find(h => h.hotelId === id)).filter(h => h);
 
-  if (hotel1 && hotel2) {
-    // Populate comparison slots
-    populateCompareSlot('compare-slot-1', hotel1);
-    populateCompareSlot('compare-slot-2', hotel2);
+  // Clear all slots first
+  clearCompareSlot('compare-slot-1');
+  clearCompareSlot('compare-slot-2');
+  clearCompareSlot('compare-slot-3');
 
-    // Scroll to comparison section
-    document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
-  }
+  // Populate slots with selected hotels
+  if (hotels.length >= 1) populateCompareSlot('compare-slot-1', hotels[0]);
+  if (hotels.length >= 2) populateCompareSlot('compare-slot-2', hotels[1]);
+  if (hotels.length >= 3) populateCompareSlot('compare-slot-3', hotels[2]);
+
+  // Scroll to comparison section
+  document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
 }
 
 function deleteSelected() {
@@ -739,7 +742,7 @@ function clearCompareSlot(slotId) {
   const slot = document.getElementById(slotId);
   if (!slot) return;
 
-  const slotNumber = slotId === 'compare-slot-1' ? '1' : '2';
+  const slotNumber = slotId === 'compare-slot-1' ? '1' : slotId === 'compare-slot-2' ? '2' : '3';
   slot.className = 'compare-placeholder';
   slot.innerHTML = `
     <h3>Hotel ${slotNumber}</h3>
