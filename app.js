@@ -384,13 +384,36 @@ function fetchDataFromExtension(extensionId) {
       console.log('[WEBSITE] Received hotels response:', event.data);
       window.removeEventListener('message', responseHandler);
 
+      // Hide the connection UI box
+      const extensionControls = document.querySelector('.extension-controls');
+      if (extensionControls) {
+        extensionControls.style.display = 'none';
+      }
+
+      // Update the library description to show extension status
+      const libraryDescription = document.getElementById('library-description');
+
       if (event.data.success && event.data.hotels) {
         currentHotels = event.data.hotels;
-        showMessage(`Successfully synced ${event.data.hotels.length} hotel${event.data.hotels.length !== 1 ? 's' : ''}!`, 'green');
+        const hotelCount = event.data.hotels.length;
+        const hotelText = hotelCount !== 1 ? 'hotels' : 'hotel';
+
+        // Update description to show active status
+        if (libraryDescription) {
+          libraryDescription.textContent = `Extension active, successfully synced ${hotelCount} ${hotelText}`;
+        }
+
+        showMessage(`Successfully synced ${hotelCount} ${hotelText}!`, 'green');
         renderLibrary(currentHotels);
         updateEmptyStates();
       } else {
         currentHotels = [];
+
+        // Update description for connected but no hotels case
+        if (libraryDescription) {
+          libraryDescription.textContent = 'Extension active, successfully synced 0 hotels';
+        }
+
         showMessage('Connected! No hotels analyzed yet.', '#009A8E');
         renderLibrary([]);
         updateEmptyStates();
