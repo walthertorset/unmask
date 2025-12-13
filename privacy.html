@@ -5,16 +5,301 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Unmask</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Privacy Policy for Unmask">
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Fraunces:wght@400;600&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .privacy-content {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 0 20px;
+            font-family: 'Inter', sans-serif;
+            color: #2d3748;
+        }
+
+        .privacy-content h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5em;
+            color: #1a202c;
+        }
+
+        .privacy-content h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8rem;
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+            color: #1a202c;
+        }
+
+        .privacy-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #2d3748;
+        }
+
+        .privacy-content p {
+            line-height: 1.7;
+            margin-bottom: 1em;
+            color: #4a5568;
+        }
+
+        .privacy-content ul {
+            margin-bottom: 1.5em;
+            padding-left: 1.5em;
+            color: #4a5568;
+        }
+
+        .privacy-content li {
+            margin-bottom: 0.5em;
+            line-height: 1.7;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container" style="padding: 50px 20px;">
+    <!-- Header -->
+    <header class="site-header" id="header" data-header-style="dynamic">
+        <div class="header-border"></div>
+        <div class="header-dropshadow"></div>
+
+        <div class="header-inner">
+            <div class="header-background"></div>
+
+            <!-- Desktop Header -->
+            <div class="header-display-desktop">
+                <div class="header-title-nav-wrapper">
+                    <!-- Logo/Title -->
+                    <div class="header-title" data-animation-role="header-element">
+                        <div class="header-title-text">
+                            <a href="index.html" id="site-title" style="display: flex; align-items: center; gap: 8px;">
+                                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                                Unmask
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Navigation -->
+                <div class="header-actions">
+                    <div class="header-nav header-nav-right">
+                        <div class="header-nav-wrapper">
+                            <nav class="header-nav-list">
+                                <div class="header-nav-item">
+                                    <a href="index.html" data-animation-role="header-element">Home</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="index.html#how-it-works" data-animation-role="header-element">How It
+                                        Works</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="dashboard.html" data-animation-role="header-element">Dashboard</a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Header -->
+            <div class="header-display-mobile">
+                <div class="header-title-nav-wrapper">
+                    <div class="header-title" data-animation-role="header-element">
+                        <div class="header-title-text">
+                            <a href="index.html" id="site-title-mobile"
+                                style="display: flex; align-items: center; gap: 8px;">
+                                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                                Unmask
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <!-- Mobile Menu Button -->
+                    <div class="header-burger" data-animation-role="header-element">
+                        <button class="header-burger-btn burger" aria-label="Toggle Menu">
+                            <span class="visually-hidden">Open Menu</span>
+                            <div class="burger-box">
+                                <div class="burger-inner">
+                                    <div class="top-bun"></div>
+                                    <div class="patty"></div>
+                                    <div class="bottom-bun"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div class="mobile-menu-overlay">
+                <nav class="mobile-nav">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#how-it-works">How It Works</a>
+                    <a href="dashboard.html">Dashboard</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="privacy-content">
         <h1>Privacy Policy</h1>
-        <p>This is a placeholder for the Privacy Policy.</p>
-        <a href="index.html">Back to Home</a>
-    </div>
+        <p>Last updated: December 13, 2024</p>
+
+        <h2>Overview</h2>
+        <p>Unmask is a Chrome extension and website that helps you make better hotel booking decisions by analyzing
+            reviews from Booking.com, Expedia, and Hotels.com using AI. We respect your privacy and are committed to
+            protecting your personal data.</p>
+
+        <h2>What We Collect</h2>
+        <p>We do not collect, store, or transmit any personally identifiable information to our servers.</p>
+
+        <h3>Chrome Extension</h3>
+        <p>The extension stores the following data locally on your device only:</p>
+        <ul>
+            <li>Hotel search queries and results</li>
+            <li>Review analysis data for up to 20 hotels</li>
+            <li>Your comparison preferences and settings</li>
+        </ul>
+
+        <h3>Website (unmask.travel)</h3>
+        <p>Our website is a static site with no backend servers. When you use the website:</p>
+        <ul>
+            <li>All hotel data and comparisons are stored locally in your browser using localStorage</li>
+            <li>We do not collect or store any data on our servers</li>
+            <li>Standard web traffic may be logged by our hosting provider (GitHub Pages) according to their privacy
+                policy</li>
+        </ul>
+
+        <h3>User-Provided Data</h3>
+        <p>If you contact us for support, we may collect:</p>
+        <ul>
+            <li>Email address</li>
+            <li>Any information you voluntarily provide in your message</li>
+        </ul>
+
+        <h2>How We Use Your Information</h2>
+        <p>Since we don't collect data on servers, we cannot use your hotel search or comparison data.</p>
+        <p>If you contact us directly, we use your information to:</p>
+        <ul>
+            <li>Respond to inquiries and support requests</li>
+            <li>Improve the Unmask service based on feedback</li>
+        </ul>
+
+        <h2>Third-Party Services</h2>
+
+        <h3>AI Processing</h3>
+        <p><strong>Anthropic Claude API:</strong> When you analyze hotel reviews, the review text is sent to Anthropic's
+            API for AI analysis. This is the only time your data leaves your browser. This data is not associated with
+            your identity and is processed according to Anthropic's privacy policy.</p>
+        <p>Our summaries and analyses are generated by AI models based on publicly available hotel reviews. We do not
+            store or process personal data from those review sources.</p>
+
+        <h3>Hotel Booking Sites</h3>
+        <p>The extension reads publicly available review data from Booking.com, Expedia, and Hotels.com pages you visit.
+            We do not access your accounts or any personal booking information on these sites.</p>
+
+        <h3>Hosting</h3>
+        <p>Our website is hosted on GitHub Pages. GitHub may collect technical information (IP addresses, browser types)
+            according to their own privacy policy. We do not have access to or control over this data.</p>
+
+        <h2>Data Sharing</h2>
+        <p>We do not sell your personal information.</p>
+        <p>We do not share your data with third parties except:</p>
+        <ul>
+            <li>Review text sent to Anthropic's API for AI analysis (as described above)</li>
+            <li>If required by law or legal process</li>
+            <li>To protect our rights, safety, or property</li>
+        </ul>
+
+        <h2>Cookies & Tracking</h2>
+        <p>Our website uses browser localStorage to store your hotel comparisons and preferences locally on your device.
+            We do not use cookies for advertising or cross-site tracking.</p>
+        <p>You can clear this data at any time through your browser settings.</p>
+
+        <h2>Data Storage and Control</h2>
+
+        <h3>Extension Data</h3>
+        <p>All hotel data and preferences are stored locally in your browser using Chrome's storage API. You can clear
+            this data at any time by:</p>
+        <ul>
+            <li>Removing the extension</li>
+            <li>Clearing your browser data</li>
+            <li>Using Chrome's extension storage management</li>
+        </ul>
+
+        <h3>Website Data</h3>
+        <p>All hotel comparison data is stored locally in your browser using localStorage. You can clear this data at
+            any time through your browser settings (Clear browsing data → Cookies and site data).</p>
+        <p>We cannot access or delete this data because it never reaches our servers.</p>
+
+        <h2>Data Security</h2>
+        <p>Since we don't store your data on servers, your information remains on your device under your control. The
+            only data transmission occurs when review text is sent to Anthropic's API for analysis, which is transmitted
+            over secure HTTPS connections.</p>
+
+        <h2>Your Rights</h2>
+        <p>Since we don't collect or store personal data on our servers, most data rights requests don't apply. However:
+        </p>
+        <ul>
+            <li>You have complete control over locally stored data and can delete it anytime</li>
+            <li>You can request deletion of any support emails you've sent us</li>
+            <li>You can contact us with questions about privacy</li>
+        </ul>
+        <p>To exercise any rights or ask questions, please contact us at the email address below.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>Unmask is not intended for children under 13 (or equivalent minimum age in your jurisdiction). We do not
+            knowingly collect personal data from children. If you believe we have inadvertently collected information
+            from a child, please contact us immediately.</p>
+
+        <h2>Changes to This Policy</h2>
+        <p>We may update this privacy policy from time to time. Any changes will be posted on this page with an updated
+            "Last updated" date. We encourage you to review this policy periodically.</p>
+
+        <h2>Contact</h2>
+        <p>If you have questions about this privacy policy, please contact us at:</p>
+        <p>Email: <a href="mailto:hi@unmask.travel">hi@unmask.travel</a></p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content" style="display: flex; justify-content: space-between;">
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <p>
+                        <a href="mailto:hi@unmask.travel">hi@unmask.travel</a>
+                    </p>
+                </div>
+
+                <div class="footer-column" style="text-align: right;">
+                    <h4>Other</h4>
+                    <p>
+                        <a href="privacy.html" target="_blank">Privacy Policy</a><br>
+                        <a href="terms.html" target="_blank">Terms of Service</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
 </body>
 
 </html>
