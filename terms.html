@@ -5,16 +5,323 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - Unmask</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Terms of Service for Unmask">
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Fraunces:wght@400;600&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .privacy-content {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 0 20px;
+            font-family: 'Inter', sans-serif;
+            color: #2d3748;
+        }
+
+        .privacy-content h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5em;
+            color: #1a202c;
+        }
+
+        .privacy-content h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8rem;
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+            color: #1a202c;
+        }
+
+        .privacy-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: #2d3748;
+        }
+
+        .privacy-content p {
+            line-height: 1.7;
+            margin-bottom: 1em;
+            color: #4a5568;
+        }
+
+        .privacy-content ul {
+            margin-bottom: 1.5em;
+            padding-left: 1.5em;
+            color: #4a5568;
+        }
+
+        .privacy-content li {
+            margin-bottom: 0.5em;
+            line-height: 1.7;
+        }
+
+        .privacy-content ol {
+            margin-bottom: 1.5em;
+            padding-left: 1.5em;
+            color: #4a5568;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container" style="padding: 50px 20px;">
+    <!-- Header -->
+    <header class="site-header" id="header" data-header-style="dynamic">
+        <div class="header-border"></div>
+        <div class="header-dropshadow"></div>
+
+        <div class="header-inner">
+            <div class="header-background"></div>
+
+            <!-- Desktop Header -->
+            <div class="header-display-desktop">
+                <div class="header-title-nav-wrapper">
+                    <!-- Logo/Title -->
+                    <div class="header-title" data-animation-role="header-element">
+                        <div class="header-title-text">
+                            <a href="index.html" id="site-title" style="display: flex; align-items: center; gap: 8px;">
+                                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                                Unmask
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Navigation -->
+                <div class="header-actions">
+                    <div class="header-nav header-nav-right">
+                        <div class="header-nav-wrapper">
+                            <nav class="header-nav-list">
+                                <div class="header-nav-item">
+                                    <a href="index.html" data-animation-role="header-element">Home</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="index.html#how-it-works" data-animation-role="header-element">How It
+                                        Works</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="dashboard.html" data-animation-role="header-element">Dashboard</a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Header -->
+            <div class="header-display-mobile">
+                <div class="header-title-nav-wrapper">
+                    <div class="header-title" data-animation-role="header-element">
+                        <div class="header-title-text">
+                            <a href="index.html" id="site-title-mobile"
+                                style="display: flex; align-items: center; gap: 8px;">
+                                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                                Unmask
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <!-- Mobile Menu Button -->
+                    <div class="header-burger" data-animation-role="header-element">
+                        <button class="header-burger-btn burger" aria-label="Toggle Menu">
+                            <span class="visually-hidden">Open Menu</span>
+                            <div class="burger-box">
+                                <div class="burger-inner">
+                                    <div class="top-bun"></div>
+                                    <div class="patty"></div>
+                                    <div class="bottom-bun"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div class="mobile-menu-overlay">
+                <nav class="mobile-nav">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#how-it-works">How It Works</a>
+                    <a href="dashboard.html">Dashboard</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="privacy-content">
         <h1>Terms of Service</h1>
-        <p>This is a placeholder for the Terms of Service.</p>
-        <a href="index.html">Back to Home</a>
-    </div>
+        <p><strong>Last updated: December 13, 2024</strong></p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using Unmask (the "Service"), including our Chrome extension and website at unmask.travel,
+            you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use
+            the Service.</p>
+
+        <h2>2. Description of Service</h2>
+        <p>Unmask is a tool that analyzes hotel reviews from Booking.com, Expedia, and Hotels.com using artificial
+            intelligence to provide adjusted ratings, summaries, and comparisons. The Service is provided free of
+            charge.</p>
+
+        <h2>3. Use of Service</h2>
+        <p>The Service is intended for personal, non-commercial use unless otherwise authorized in writing.</p>
+
+        <h3>Acceptable Use</h3>
+        <p>You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to:
+        </p>
+        <ul>
+            <li>Use the Service in any way that violates applicable laws or regulations</li>
+            <li>Use the Service for commercial purposes without our prior written authorization</li>
+            <li>Copy, scrape, or republish AI-generated content from the Service without permission</li>
+            <li>Misrepresent or misuse AI-generated content for unlawful or misleading purposes</li>
+            <li>Attempt to interfere with, disrupt, or harm the Service or servers</li>
+            <li>Attempt to gain unauthorized access to any portion of the Service</li>
+            <li>Use automated systems (bots, scrapers) to access the Service in ways not intended</li>
+            <li>Reverse engineer, decompile, or disassemble any part of the Service</li>
+        </ul>
+
+        <h3>Age Requirement</h3>
+        <p>You must be at least 13 years old to use the Service.</p>
+
+        <h2>4. AI-Generated Content</h2>
+        <p>The Service uses artificial intelligence to analyze and summarize hotel reviews. You acknowledge that:</p>
+        <ul>
+            <li>AI-generated content may contain inaccuracies or errors</li>
+            <li>Summaries are based on publicly available reviews and may not reflect all aspects of a hotel</li>
+            <li>The Service provides information for reference only and should not be your sole basis for booking
+                decisions</li>
+            <li>We do not guarantee the accuracy, completeness, or reliability of any AI-generated content</li>
+        </ul>
+
+        <h2>5. Third-Party Content and Links</h2>
+        <p>The Service analyzes reviews from third-party hotel booking sites (Booking.com, Expedia, Hotels.com). We do
+            not:</p>
+        <ul>
+            <li>Control or endorse the content on these third-party sites</li>
+            <li>Guarantee the accuracy of reviews or information from these sites</li>
+            <li>Have any affiliation with hotels mentioned in reviews</li>
+        </ul>
+        <p>Our website may contain affiliate links to hotel booking sites. If you make a purchase through these links,
+            we may earn a commission at no additional cost to you. This does not affect our analysis or recommendations.
+        </p>
+
+        <h2>6. Intellectual Property</h2>
+
+        <h3>Our Rights</h3>
+        <p>The Service, including its design, features, code, and content (excluding user-generated and third-party
+            content), is owned by Unmask and is protected by copyright, trademark, and other intellectual property laws.
+        </p>
+
+        <h3>Your Rights</h3>
+        <p>You retain ownership of any data you input into the Service. By using the Service, you grant us a limited
+            license to process your inputs (hotel searches, review analysis requests) solely to provide the Service.</p>
+
+        <h2>7. Disclaimer of Warranties</h2>
+        <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+            INCLUDING BUT NOT LIMITED TO:</p>
+        <ul>
+            <li>Warranties of merchantability or fitness for a particular purpose</li>
+            <li>Warranties that the Service will be uninterrupted, error-free, or secure</li>
+            <li>Warranties regarding the accuracy or reliability of AI-generated content</li>
+        </ul>
+
+        <h2>8. Limitation of Liability</h2>
+        <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, UNMASK SHALL NOT BE LIABLE FOR:</p>
+        <ul>
+            <li>Any indirect, incidental, special, or consequential damages</li>
+            <li>Loss of profits, data, or business opportunities</li>
+            <li>Damages resulting from your use or inability to use the Service</li>
+            <li>Damages resulting from reliance on AI-generated content or hotel review analyses</li>
+        </ul>
+        <p>IN NO EVENT SHALL OUR TOTAL LIABILITY EXCEED $100 USD.</p>
+
+        <h2>9. Indemnification</h2>
+        <p>You agree to indemnify and hold harmless Unmask from any claims, damages, losses, or expenses (including
+            legal fees) arising from:</p>
+        <ul>
+            <li>Your use of the Service</li>
+            <li>Your violation of these Terms</li>
+            <li>Your violation of any rights of third parties</li>
+        </ul>
+
+        <h2>10. Privacy</h2>
+        <p>Your use of the Service is also governed by our Privacy Policy, which is incorporated into these Terms by
+            reference. Please review our Privacy Policy to understand our data practices.</p>
+
+        <h2>11. Modifications to Service and Terms</h2>
+        <p>We reserve the right to:</p>
+        <ul>
+            <li>Modify or discontinue the Service at any time without notice</li>
+            <li>Update these Terms at any time by posting revised Terms with a new "Last updated" date</li>
+            <li>Your continued use of the Service after changes constitutes acceptance of the new Terms</li>
+        </ul>
+
+        <h2>12. Termination</h2>
+        <p>We may terminate or suspend your access to the Service at any time, with or without cause or notice. You may
+            stop using the Service at any time by uninstalling the extension and ceasing to use the website.</p>
+        <p>Upon termination, all licenses and rights granted to you will immediately cease.</p>
+
+        <h2>13. Governing Law</h2>
+        <p>These Terms shall be governed by and construed in accordance with the laws of Norway, without regard to its
+            conflict of law provisions.</p>
+
+        <h2>14. Dispute Resolution</h2>
+        <p>Any disputes arising from these Terms or your use of the Service shall be resolved through:</p>
+        <ol>
+            <li>Good faith negotiations between the parties</li>
+            <li>If negotiations fail, binding arbitration in Oslo, Norway</li>
+        </ol>
+
+        <h2>15. Severability</h2>
+        <p>If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or
+            eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force.</p>
+
+        <h2>16. Entire Agreement</h2>
+        <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and Unmask
+            regarding the Service.</p>
+
+        <h2>17. Contact</h2>
+        <p>If you have questions about these Terms, please contact us at:</p>
+        <p><strong>Email:</strong> <a href="mailto:hi@unmask.travel">hi@unmask.travel</a></p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content" style="display: flex; justify-content: space-between;">
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <p>
+                        <a href="mailto:hi@unmask.travel">hi@unmask.travel</a>
+                    </p>
+                </div>
+
+                <div class="footer-column" style="text-align: right;">
+                    <h4>Legal</h4>
+                    <p>
+                        <a href="privacy.html" target="_blank">Privacy Policy</a><br>
+                        <a href="terms.html" target="_blank">Terms of Service</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
 </body>
 
 </html>
