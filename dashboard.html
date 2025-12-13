@@ -7,6 +7,9 @@
   <title>Unmask - Compare Hotels with AI</title>
   <meta name="description" content="Compare hotels side-by-side with AI-powered review analysis">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -32,7 +35,10 @@
           <!-- Logo/Title -->
           <div class="header-title" data-animation-role="header-element">
             <div class="header-title-text">
-              <a href="index.html" id="site-title">Unmask</a>
+              <a href="index.html" id="site-title" style="display: flex; align-items: center; gap: 8px;">
+                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                Unmask
+              </a>
             </div>
           </div>
 
@@ -64,7 +70,10 @@
         <div class="header-title-nav-wrapper">
           <div class="header-title" data-animation-role="header-element">
             <div class="header-title-text">
-              <a href="index.html" id="site-title-mobile">Unmask</a>
+              <a href="index.html" id="site-title-mobile" style="display: flex; align-items: center; gap: 8px;">
+                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                Unmask
+              </a>
             </div>
           </div>
         </div>
@@ -129,7 +138,8 @@
           </div>
         </div>
       </div>
-      <div id="compare-empty-state" class="empty-state-message" style="display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f7fafc; border-radius: 8px; color: #4a5568;">
+      <div id="compare-empty-state" class="empty-state-message"
+        style="display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f7fafc; border-radius: 8px; color: #4a5568;">
         <p style="font-size: 18px; margin-bottom: 15px; font-weight: 600;">No Hotels to Compare Yet</p>
         <p style="margin-bottom: 10px;">To compare hotels, you need to:</p>
         <ol style="text-align: left; max-width: 500px; margin: 20px auto; line-height: 1.8;">
@@ -138,7 +148,8 @@
           <li><strong>Click "Analyze with Unmask"</strong> on each hotel page</li>
           <li><strong>Return here</strong> to see your analyzed hotels and compare them side-by-side</li>
         </ol>
-        <p style="margin-top: 20px; font-size: 14px; color: #718096;">Hotels will automatically appear in your library below once analyzed.</p>
+        <p style="margin-top: 20px; font-size: 14px; color: #718096;">Hotels will automatically appear in your library
+          below once analyzed.</p>
       </div>
     </div>
   </section>
@@ -147,7 +158,8 @@
   <section class="library-section" id="library">
     <div class="container">
       <h2 class="section-title">Library</h2>
-      <p class="section-description" id="library-description">Your analyzed hotels appear here automatically when you use the Unmask extension on Booking.com.</p>
+      <p class="section-description" id="library-description">Your analyzed hotels appear here automatically when you
+        use the Unmask extension on Booking.com.</p>
       <!-- Connection UI and library grid will be populated by JavaScript -->
       <div class="library-grid">
         <!-- Hotels will appear here automatically when synced from extension -->
