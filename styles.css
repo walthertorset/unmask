@@ -731,20 +731,23 @@ img {
 
 .compare-container {
   display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr;
-  gap: var(--spacing-lg);
-  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-sm);
+  align-items: stretch;
   margin-top: var(--spacing-lg);
 }
 
 .compare-column {
   background: var(--color-background);
   border-radius: 8px;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-md);
   min-height: 400px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+}
+
+.compare-divider {
+  display: none; /* Hide standard dividers to save space */
 }
 
 .compare-placeholder {

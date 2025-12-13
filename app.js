@@ -735,31 +735,61 @@ function populateCompareSlot(slotId, hotel) {
   else if (diff < -0.5) { deviationText = 'Minor rating inflation'; devColor = '#dd6b20'; }
   else if (diff > 0.5) { deviationText = 'Better than rated'; devColor = '#38a169'; }
 
+  // Format price information
+  const priceInfo = hotel.priceData
+    ? `${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}`
+    : 'Price N/A';
+
+  // Get value score from analysis
+  const valueScore = hotel.analysis.valueScore
+    ? `${hotel.analysis.valueScore}/10`
+    : 'N/A';
+
+  // Get trends information
+  const trendsText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No trend data available';
+
   const imageHTML = hotel.imageUrl
-    ? `<img src="${hotel.imageUrl}" alt="${cleanName}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">`
-    : `<div style="width: 100%; height: 150px; background: #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;">🏨</div>`;
+    ? `<img src="${hotel.imageUrl}" alt="${cleanName}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">`
+    : `<div style="width: 100%; height: 200px; background: #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;">🏨</div>`;
 
   slot.innerHTML = `
-    <div style="text-align: left;">
+    <div style="text-align: left; width: 100%;">
       ${imageHTML}
-      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748;">${cleanName}</h3>
-      <p style="margin-bottom: 8px; font-size: 14px; color: #718096;">📍 ${hotel.location || 'Unknown'}</p>
+      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cleanName}">${cleanName}</h3>
+      <p style="margin-bottom: 12px; font-size: 14px; color: #718096;">📍 ${hotel.location || 'Unknown'}</p>
 
-      <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 6px;">
+      <div style="margin-bottom: 15px; padding: 12px; background: #f7fafc; border-radius: 6px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span style="color: #4a5568; font-size: 14px;">Listed Score:</span>
           <span style="font-weight: bold; font-size: 16px;">${Number(hotel.originalRating).toFixed(1)}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
           <span style="color: #4a5568; font-size: 14px;">Adjusted Score:</span>
           <span style="font-weight: bold; font-size: 16px; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</span>
         </div>
-        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-          <p style="font-size: 13px; font-style: italic; color: ${devColor};">${deviationText}</p>
+        <div style="font-size: 11px; font-style: italic; color: ${devColor}; text-align: right;">${deviationText}</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+        <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
+          <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Price/Night</div>
+          <div style="font-size: 14px; font-weight: 600;">${priceInfo}</div>
+        </div>
+        <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
+          <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Value Score</div>
+          <div style="font-size: 14px; font-weight: 600; color: #009A8E;">${valueScore}</div>
         </div>
       </div>
 
-      <button onclick="clearCompareSlot('${slotId}')" style="margin-top: 15px; width: 100%; padding: 8px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+      <div style="margin-bottom: 15px; background: #f7fafc; padding: 10px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: #4a5568;">
+        <strong>Trend:</strong> ${trendsText}
+      </div>
+
+      <a href="${hotel.url}" target="_blank" style="display: block; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s; margin-bottom: 8px;">
+        View on ${getOTAName(hotel.url)}
+      </a>
+
+      <button onclick="clearCompareSlot('${slotId}')" style="width: 100%; padding: 8px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
         Remove
       </button>
     </div>
@@ -776,7 +806,7 @@ function clearCompareSlot(slotId) {
   slot.className = 'compare-placeholder';
   slot.innerHTML = `
     <h3>Hotel ${slotNumber}</h3>
-    <p>Select a hotel from your library to compare</p>
+    <p>Select a hotel to compare</p>
   `;
 }
 
