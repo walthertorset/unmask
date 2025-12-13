@@ -527,8 +527,9 @@ function renderLibrary(hotels) {
             <div style="font-size: 16px; font-weight: bold;">${Number(hotel.originalRating).toFixed(1)}</div>
           </div>
           <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
-            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">True Score</div>
+            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Adjusted Score</div>
             <div style="font-size: 16px; font-weight: bold; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</div>
+            <div style="font-size: 10px; margin-top: 2px; font-style: italic; color: ${devColor};">${deviationText}</div>
           </div>
         </div>
 
@@ -543,11 +544,7 @@ function renderLibrary(hotels) {
           </div>
         </div>
 
-        <p class="deviation-text" style="font-size: 12px; margin-bottom: 8px; font-style: italic; color: ${devColor};">
-          ${deviationText}
-        </p>
-
-        <div style="margin-bottom: 12px; background: #f7fafc; padding: 8px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #4a5568; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${trendsText}">
+        <div style="margin-bottom: 12px; background: #f7fafc; padding: 8px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: #4a5568;">
           <strong>Trend:</strong> ${trendsText}
         </div>
 
@@ -754,7 +751,7 @@ function populateCompareSlot(slotId, hotel) {
           <span style="font-weight: bold; font-size: 16px;">${Number(hotel.originalRating).toFixed(1)}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #4a5568; font-size: 14px;">True Score:</span>
+          <span style="color: #4a5568; font-size: 14px;">Adjusted Score:</span>
           <span style="font-weight: bold; font-size: 16px; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</span>
         </div>
         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
