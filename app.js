@@ -833,30 +833,30 @@ function renderRecommendation(hotels) {
 
   container.style.display = 'block';
   container.innerHTML = `
-    <div style="background: linear-gradient(135deg, #009A8E 0%, #007F75 100%); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 154, 142, 0.2); position: relative; overflow: hidden;">
-      <div style="position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.1;">🏆</div>
+    <div style="background: #f0fdfa; border: 1px solid #ccfbf1; color: #2d3748; padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.05;">🏆</div>
       
       <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
         <div style="flex: 1;">
-          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; opacity: 0.9;">Unmask Recommends</div>
-          <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 5px;">${cleanName}</h3>
-          <p style="font-size: 15px; opacity: 0.9; max-width: 600px;">
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; color: #009A8E;">Unmask Recommends</div>
+          <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 5px; color: #1a202c;">${cleanName}</h3>
+          <p style="font-size: 15px; color: #4a5568; max-width: 600px;">
             Based on our analysis, this hotel offers the best combination of quality and value among your selection.
           </p>
         </div>
         
         <div style="display: flex; gap: 15px;">
-          <div style="background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 12px; opacity: 0.8;">Adjusted Quality</div>
-            <div style="font-size: 20px; font-weight: 700;">${winner.analysis.adjustedRating.toFixed(1)}</div>
+          <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #718096;">Adjusted Quality</div>
+            <div style="font-size: 20px; font-weight: 700; color: #2d3748;">${winner.analysis.adjustedRating.toFixed(1)}</div>
           </div>
-          <div style="background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 12px; opacity: 0.8;">Value Score</div>
-            <div style="font-size: 20px; font-weight: 700;">${winner.analysis.valueScore || 'N/A'}/10</div>
+          <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #718096;">Value Score</div>
+            <div style="font-size: 20px; font-weight: 700; color: #009A8E;">${winner.analysis.valueScore || 'N/A'}/10</div>
           </div>
         </div>
         
-        <a href="${winner.url}" target="_blank" style="background: white; color: #009A8E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s;">
+        <a href="${winner.url}" target="_blank" style="background: #009A8E; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 4px rgba(0,154,142,0.2); transition: transform 0.2s;">
           Book Now ↗
         </a>
       </div>
