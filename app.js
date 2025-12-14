@@ -105,7 +105,7 @@ if (contactForm) {
     const formData = new FormData(contactForm);
     const data = Object.fromEntries(formData);
 
-    console.log('Form submitted:', data);
+    // console.log('Form submitted:', data);
 
     // Show success message (you'll replace this with actual form handling)
     alert('Thank you for your message! We will get back to you soon.');
@@ -125,7 +125,7 @@ newsletterForms.forEach(form => {
 
     const email = form.querySelector('input[type="email"]').value;
 
-    console.log('Newsletter signup:', email);
+    // console.log('Newsletter signup:', email);
 
     alert('Thank you for subscribing!');
 
