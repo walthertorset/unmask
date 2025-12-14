@@ -693,6 +693,9 @@ function compareSelected() {
 
   // Scroll to comparison section
   document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
+
+  // Render recommendation based on selected hotels
+  renderRecommendation(hotels);
 }
 
 function deleteSelected() {
@@ -718,6 +721,11 @@ function deleteSelected() {
   // Re-render library
   renderLibrary(currentHotels);
   updateEmptyStates();
+
+  // Re-run recommendation with remaining hotels
+  // If a deleted hotel was being compared, it will be excluded from recommendation
+  const currentHotelsInComparison = getCurrentComparedHotels();
+  renderRecommendation(currentHotelsInComparison);
 
   showMessage(`Deleted ${count} hotel${count > 1 ? 's' : ''}`, '#e53e3e');
 }
@@ -796,6 +804,89 @@ function populateCompareSlot(slotId, hotel) {
   `;
 
   slot.className = 'compare-filled';
+  slot.dataset.hotelId = hotel.hotelId;
+}
+
+function renderRecommendation(hotels) {
+  const container = document.getElementById('recommendation-container');
+  if (!container) return;
+
+  // Clear if not enough hotels
+  if (!hotels || hotels.length < 2) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+
+  // Calculate scores and find winner
+  // Logic: Score = AdjustedRating + (ValueScore * 0.5)
+  // Max score ≈ 10 + 5 = 15
+  const rankedHotels = hotels.map(hotel => {
+    const rating = hotel.analysis.adjustedRating || 0;
+    const value = hotel.analysis.valueScore || 5; // Default to middle if missing
+    const score = rating + (value * 0.5);
+    return { ...hotel, score };
+  }).sort((a, b) => b.score - a.score);
+
+  const winner = rankedHotels[0];
+  const cleanName = cleanHotelName(winner.hotelName);
+
+  container.style.display = 'block';
+  container.innerHTML = `
+    <div style="background: linear-gradient(135deg, #009A8E 0%, #007F75 100%); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 154, 142, 0.2); position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.1;">🏆</div>
+      
+      <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1;">
+          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; opacity: 0.9;">Unmask Recommends</div>
+          <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 5px;">${cleanName}</h3>
+          <p style="font-size: 15px; opacity: 0.9; max-width: 600px;">
+            Based on our analysis, this hotel offers the best combination of quality and value among your selection.
+          </p>
+        </div>
+        
+        <div style="display: flex; gap: 15px;">
+          <div style="background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.8;">Adjusted Quality</div>
+            <div style="font-size: 20px; font-weight: 700;">${winner.analysis.adjustedRating.toFixed(1)}</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.15); padding: 10px 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; opacity: 0.8;">Value Score</div>
+            <div style="font-size: 20px; font-weight: 700;">${winner.analysis.valueScore || 'N/A'}/10</div>
+          </div>
+        </div>
+        
+        <a href="${winner.url}" target="_blank" style="background: white; color: #009A8E; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s;">
+          Book Now ↗
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+function getCurrentComparedHotels() {
+  const slots = ['compare-slot-1', 'compare-slot-2', 'compare-slot-3'];
+  const hotels = [];
+
+  slots.forEach(slotId => {
+    const slot = document.getElementById(slotId);
+    if (!slot || !slot.classList.contains('compare-filled')) return;
+
+    // Reverse engineer ID from title or find in currentHotels based on rendered name
+    // Easier: store hotel ID in dataset when populating
+    const titleEl = slot.querySelector('h3');
+    if (titleEl) {
+      // Find hotel by matching name in currentHotels (not perfect but works for now)
+      // Better: Update populateCompareSlot to store ID
+      // Let's implement getting ID from dataset which we'll add
+      const hotelId = slot.dataset.hotelId;
+      if (hotelId) {
+        const hotel = currentHotels.find(h => h.hotelId === hotelId);
+        if (hotel) hotels.push(hotel);
+      }
+    }
+  });
+  return hotels;
 }
 
 function clearCompareSlot(slotId) {
@@ -804,10 +895,15 @@ function clearCompareSlot(slotId) {
 
   const slotNumber = slotId === 'compare-slot-1' ? '1' : slotId === 'compare-slot-2' ? '2' : '3';
   slot.className = 'compare-placeholder';
+  slot.dataset.hotelId = ''; // Clear hotel ID
   slot.innerHTML = `
     <h3>Hotel ${slotNumber}</h3>
     <p>Select a hotel to compare</p>
   `;
+
+  // Re-run recommendation with remaining hotels
+  const currentHotelsInComparison = getCurrentComparedHotels();
+  renderRecommendation(currentHotelsInComparison);
 }
 
 function cleanHotelName(rawName) {
