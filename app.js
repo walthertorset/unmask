@@ -736,6 +736,23 @@ function renderLibraryGrid(hotels) {
       insightText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No specific insights available';
     }
 
+    // Append short trend if available
+    if (hotel.analysis.trends) {
+      const lowerTrend = hotel.analysis.trends.toLowerCase();
+      let trendShort = '';
+
+      if (lowerTrend.includes('declin') || lowerTrend.includes('worse') || lowerTrend.includes('deterior') || lowerTrend.includes('drop')) {
+        trendShort = 'Trending down.';
+      } else if (lowerTrend.includes('improv') || lowerTrend.includes('better') || lowerTrend.includes('upgrad') || lowerTrend.includes('renovat')) {
+        trendShort = 'Improving.';
+      }
+
+      if (trendShort) {
+        if (insightText && !insightText.endsWith('.')) insightText += '.';
+        insightText += ` ${trendShort}`;
+      }
+    }
+
     return `
     <article class="hotel-card" data-hotel-id="${hotel.hotelId}">
       <div class="hotel-image" style="background-color: #e2e8f0; height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
@@ -755,17 +772,27 @@ function renderLibraryGrid(hotels) {
           Analyzed: ${analyzedDate}
         </div>
 
-        <div class="hotel-scores" style="margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-          <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
-            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Listed Score</div>
-            <div style="font-size: 16px; font-weight: bold;">${Number(hotel.originalRating).toFixed(1)}</div>
+        <!-- Rating Comparison -->
+        <div class="rr-rating-section">
+          <div class="rr-rating-comparison">
+            <div class="rr-rating-item">
+              <div class="rr-rating-label">Listed Rating</div>
+              <div class="rr-rating-value rr-original">${Number(hotel.originalRating).toFixed(1)}</div>
+            </div>
+            <div class="rr-rating-arrow ${ratingStatus}">
+              ${ratingStatus === 'lower' ? '↓' : ratingStatus === 'higher' ? '↑' : '→'}
+            </div>
+            <div class="rr-rating-item">
+              <div class="rr-rating-label">Adjusted Rating</div>
+              <div class="rr-rating-value rr-adjusted">${hotel.analysis.adjustedRating.toFixed(1)}</div>
+            </div>
           </div>
-          <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
-            <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Adjusted Score</div>
-            <div style="font-size: 16px; font-weight: bold; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</div>
-            <div style="font-size: 10px; margin-top: 2px; font-style: italic; color: ${devColor};">${deviationText}</div>
-            ${hotel.reviewCount ? `<div style="font-size: 10px; color: #a0aec0; margin-top: 2px;">Based on ${hotel.reviewCount} reviews</div>` : ''}
+          <div class="rr-rating-status ${ratingStatus}">
+            ${ratingStatus === 'lower' ? '⚠️ Lower than advertised' :
+        ratingStatus === 'higher' ? '✨ Better than expected' :
+          '✓ Rating is accurate'}
           </div>
+          ${hotel.reviewCount ? `<div style="font-size: 10px; color: #a0aec0; margin-top: 6px; text-align: center;">Based on ${hotel.reviewCount} reviews</div>` : ''}
         </div>
 
         <div style="display: grid; grid-template-columns: ${valueScore ? '1fr 1fr' : '1fr'}; gap: 8px; margin-bottom: 10px;">
@@ -781,7 +808,7 @@ function renderLibraryGrid(hotels) {
           ` : ''}
         </div>
 
-        <div style="margin-bottom: 12px; background: #fdf2f8; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #702459; display: flex; align-items: start; gap: 6px; border: 1px solid #fbcfe8;">
+        <div style="margin-bottom: 12px; background: #f8fafc; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #4a5568; display: flex; align-items: start; gap: 6px; border: 1px solid #e2e8f0;">
           <span style="font-size: 14px;">💡</span>
           <span style="font-weight: 500;">${insightText}</span>
         </div>
@@ -1026,7 +1053,10 @@ function populateCompareSlot(slotId, hotel) {
           <div class="metric-values rating-comparison">
              <span class="listed-rating" title="Listed">${Number(hotel.originalRating).toFixed(1)}</span>
              <span class="rating-arrow">→</span>
-             <span class="adjusted-rating" style="background-color: ${getRatingColorBox(hotel.analysis.adjustedRating)};" title="Adjusted">${hotel.analysis.adjustedRating.toFixed(1)}</span>
+             <div style="display: flex; flex-direction: column; align-items: center;">
+               <span class="adjusted-rating" style="background-color: ${getRatingColorBox(hotel.analysis.adjustedRating)};" title="Adjusted">${hotel.analysis.adjustedRating.toFixed(1)}</span>
+               ${hotel.reviewCount ? `<span style="font-size: 9px; color: #a0aec0; margin-top: 2px; line-height: 1;">(${hotel.reviewCount})</span>` : ''}
+             </div>
           </div>
         </div>
 
@@ -1071,7 +1101,7 @@ function populateCompareSlot(slotId, hotel) {
       </div>
 
       <a href="${hotel.url}" target="_blank" class="compare-cta">
-        View Deal ↗
+        View on ${getOTAName(hotel.url)}
       </a>
     </div>
   `;

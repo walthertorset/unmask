@@ -1387,3 +1387,91 @@ img {
   background: #009A8E;
   color: white;
 }
+
+/* Extension-style Score Overview */
+.rr-rating-section {
+  background: #F7F7F7;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.rr-rating-comparison {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 12px;
+}
+
+.rr-rating-item {
+  text-align: center;
+}
+
+.rr-rating-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #718096;
+  margin-bottom: 4px;
+}
+
+.rr-rating-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rr-original {
+  color: #718096;
+}
+
+.rr-adjusted {
+  color: #009A8E;
+}
+
+.rr-rating-arrow {
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rr-rating-arrow.lower {
+  color: #f56565;
+}
+
+.rr-rating-arrow.higher {
+  color: #009A8E;
+}
+
+.rr-rating-arrow.accurate {
+  color: #CFE8F1;
+}
+
+.rr-rating-status {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.rr-rating-status.lower {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+.rr-rating-status.higher {
+  background: #CFE8F1;
+  color: #009A8E;
+}
+
+.rr-rating-status.accurate {
+  background: #e2e8f0;
+  color: #4a5568;
+}
