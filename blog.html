@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Unmask</title>
+    <meta name="description" content="Insights and tips on travel, hotel reviews, and spotting fake ratings.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Fraunces:wght@400;600&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="site-header" id="header" data-header-style="dynamic">
+        <div class="header-border"></div>
+        <div class="header-dropshadow"></div>
+
+        <div class="header-inner">
+            <div class="header-background"></div>
+
+            <!-- Desktop Header -->
+            <div class="header-display-desktop">
+                <div class="header-title-nav-wrapper">
+                    <!-- Logo/Title -->
+                    <div class="header-title" data-animation-role="header-element">
+                        <div class="header-title-text">
+                            <a href="index.html" id="site-title" style="display: flex; align-items: center; gap: 8px;">
+                                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                                Unmask
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Navigation -->
+                <div class="header-actions">
+                    <div class="header-nav header-nav-right">
+                        <div class="header-nav-wrapper">
+                            <nav class="header-nav-list">
+                                <div class="header-nav-item">
+                                    <a href="index.html" data-animation-role="header-element">Home</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="index.html#how-it-works" data-animation-role="header-element">How It
+                                        Works</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="dashboard.html" data-animation-role="header-element">Dashboard</a>
+                                </div>
+                                <div class="header-nav-item">
+                                    <a href="blog.html" class="active" data-animation-role="header-element">Blog</a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Mobile Header -->
+            <div class="header-display-mobile">
+                <div class="header-title-nav-wrapper">
+                    <div class="header-title" data-animation-role="header-element">
+                        <div class="header-title-text">
+                            <a href="index.html" id="site-title-mobile"
+                                style="display: flex; align-items: center; gap: 8px;">
+                                <img src="favicon.png" alt="Unmask logo" style="width: 40px; height: 40px;">
+                                Unmask
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <!-- Mobile Menu Button -->
+                    <div class="header-burger" data-animation-role="header-element">
+                        <button class="header-burger-btn burger" aria-label="Toggle Menu">
+                            <span class="visually-hidden">Open Menu</span>
+                            <div class="burger-box">
+                                <div class="burger-inner">
+                                    <div class="top-bun"></div>
+                                    <div class="patty"></div>
+                                    <div class="bottom-bun"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div class="mobile-menu-overlay">
+                <nav class="mobile-nav">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#how-it-works">How It Works</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="blog.html" class="active">Blog</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Blog Hero -->
+    <section class="hero blog-hero" style="padding-top: 140px; padding-bottom: 60px;">
+        <div class="container">
+            <h1>Unmask Blog</h1>
+            <p class="section-description">Insights on travel safety, hotel reviews, and how to spot the fakes.</p>
+        </div>
+    </section>
+
+    <!-- Blog Grid Section -->
+    <section class="blog-section" style="padding-bottom: 100px;">
+        <div class="container">
+            <div class="blog-grid">
+
+                <!-- Article 1 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <img src="https://images.unsplash.com/photo-1579487785973-74d2ca7abdd5?w=800&auto=format&fit=crop"
+                            alt="Magnifying glass on reviews">
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Guides</span>
+                            <span class="blog-date">Dec 12, 2025</span>
+                        </div>
+                        <h3>How to Spot Fake Reviews on Booking.com</h3>
+                        <p>Fake reviews are becoming increasingly sophisticated. Learn the subtle red flags that
+                            indicate a hotel rating might be manipulated.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </article>
+
+                <!-- Article 2 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"
+                            alt="Luxury hotel lobby">
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Industry</span>
+                            <span class="blog-date">Dec 08, 2025</span>
+                        </div>
+                        <h3>The Truth About "5-Star" Ratings</h3>
+                        <p>What does a 5-star rating really mean? We dive into the criteria used by OTAs vs the reality
+                            of guest experiences.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </article>
+
+                <!-- Article 3 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop"
+                            alt="Traveler exploring city">
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Tips</span>
+                            <span class="blog-date">Nov 28, 2025</span>
+                        </div>
+                        <h3>Save Money on Your Next Trip</h3>
+                        <p>Beyond just finding the best quality, learn how analyzing price-history and trends can help
+                            you book at the perfect time.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </article>
+
+                <!-- Article 4 -->
+                <article class="blog-card">
+                    <div class="blog-image">
+                        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&auto=format&fit=crop"
+                            alt="Hotel room view">
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category">Analysis</span>
+                            <span class="blog-date">Nov 15, 2025</span>
+                        </div>
+                        <h3>Why Cleanliness Scores Matter Most</h3>
+                        <p>Our data shows that cleanliness is the #1 predictor of overall guest satisfaction. Here's why
+                            you should prioritize it.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content" style="display: flex; justify-content: space-between;">
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <p>
+                        <a href="mailto:hi@unmask.travel">hi@unmask.travel</a>
+                    </p>
+                </div>
+
+                <div class="footer-column" style="text-align: right;">
+                    <h4>Legal</h4>
+                    <p>
+                        <a href="privacy.html" target="_blank">Privacy Policy</a><br>
+                        <a href="terms.html" target="_blank">Terms of Service</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
