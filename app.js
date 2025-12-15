@@ -495,9 +495,10 @@ function renderLibrary(hotels) {
       : 'Price N/A';
 
     // Get value score from analysis (1-10 scale from AI)
-    const valueScore = hotel.analysis.valueScore
+    // Only show if we have price data, otherwise it's meaningless
+    const valueScore = (hotel.priceData && hotel.analysis.valueScore)
       ? `${hotel.analysis.valueScore}/10`
-      : 'N/A';
+      : null;
 
     // Get trends information
     const trendsText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No trend data available';
@@ -512,11 +513,11 @@ function renderLibrary(hotels) {
       </div>
       <div class="hotel-content">
         <h3 style="margin-bottom: 8px; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cleanName}">${cleanName}</h3>
-
+        
         <div style="font-size: 13px; color: #718096; margin-bottom: 4px;">
           <span style="margin-right: 4px;">📍</span>${hotel.location || 'Unknown Location'}
         </div>
-
+        
         <div style="font-size: 12px; color: #a0aec0; margin-bottom: 12px;">
           Analyzed: ${analyzedDate}
         </div>
@@ -533,15 +534,17 @@ function renderLibrary(hotels) {
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+        <div style="display: grid; grid-template-columns: ${valueScore ? '1fr 1fr' : '1fr'}; gap: 8px; margin-bottom: 10px;">
           <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
             <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Price/Night</div>
             <div style="font-size: 14px; font-weight: 600;">${priceInfo}</div>
           </div>
+          ${valueScore ? `
           <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
             <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Value Score</div>
             <div style="font-size: 14px; font-weight: 600; color: #009A8E;">${valueScore}</div>
           </div>
+          ` : ''}
         </div>
 
         <div style="margin-bottom: 12px; background: #f7fafc; padding: 8px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: #4a5568;">
@@ -749,9 +752,9 @@ function populateCompareSlot(slotId, hotel) {
     : 'Price N/A';
 
   // Get value score from analysis
-  const valueScore = hotel.analysis.valueScore
+  const valueScore = (hotel.priceData && hotel.analysis.valueScore)
     ? `${hotel.analysis.valueScore}/10`
-    : 'N/A';
+    : null;
 
   // Get trends information
   const trendsText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No trend data available';
@@ -778,15 +781,17 @@ function populateCompareSlot(slotId, hotel) {
         <div style="font-size: 11px; font-style: italic; color: ${devColor}; text-align: right;">${deviationText}</div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+      <div style="display: grid; grid-template-columns: ${valueScore ? '1fr 1fr' : '1fr'}; gap: 8px; margin-bottom: 15px;">
         <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
           <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Price/Night</div>
           <div style="font-size: 14px; font-weight: 600;">${priceInfo}</div>
         </div>
+        ${valueScore ? `
         <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
           <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Value Score</div>
           <div style="font-size: 14px; font-weight: 600; color: #009A8E;">${valueScore}</div>
         </div>
+        ` : ''}
       </div>
 
       <div style="margin-bottom: 15px; background: #f7fafc; padding: 10px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: #4a5568;">
