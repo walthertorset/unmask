@@ -178,6 +178,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
 let currentExtensionId = localStorage.getItem(STORAGE_KEY_EXT_ID) || '';
 let currentHotels = [];
+let currentFilters = {
+  search: '',
+  destination: 'all',
+  valueScore: 'all',
+  priceRange: 'all',
+  sortBy: 'date-newest'
+};
 
 // ===== INITIALIZE ALL FUNCTIONALITY ON PAGE LOAD =====
 document.addEventListener('DOMContentLoaded', function () {
@@ -437,14 +444,197 @@ function fetchDataFromExtension(extensionId) {
   console.log('[WEBSITE] Message sent');
 }
 
+function getFilteredAndSortedHotels() {
+  let filtered = [...currentHotels];
+
+  // 1. Filter by Search
+  if (currentFilters.search) {
+    const term = currentFilters.search.toLowerCase();
+    filtered = filtered.filter(h => h.hotelName.toLowerCase().includes(term));
+  }
+
+  // 2. Filter by Destination
+  if (currentFilters.destination !== 'all') {
+    filtered = filtered.filter(h => {
+      const loc = h.location || 'Unknown';
+      return loc === currentFilters.destination;
+    });
+  }
+
+  // 3. Filter by Value Score
+  if (currentFilters.valueScore !== 'all') {
+    filtered = filtered.filter(h => {
+      const score = h.analysis.valueScore; // 1-10
+      if (!score) return false;
+      if (currentFilters.valueScore === 'high') return score >= 8;
+      if (currentFilters.valueScore === 'good') return score >= 6 && score < 8;
+      if (currentFilters.valueScore === 'avg') return score < 6;
+      return true;
+    });
+  }
+
+  // 4. Filter by Price Range
+  if (currentFilters.priceRange !== 'all') {
+    filtered = filtered.filter(h => {
+      const price = h.priceData ? h.priceData.pricePerNight : null;
+      if (!price) return false;
+      if (currentFilters.priceRange === 'low') return price < 150;
+      if (currentFilters.priceRange === 'med') return price >= 150 && price <= 300;
+      if (currentFilters.priceRange === 'high') return price > 300;
+      return true;
+    });
+  }
+
+  // 5. Sort
+  filtered.sort((a, b) => {
+    switch (currentFilters.sortBy) {
+      case 'date-newest':
+        return new Date(b.analyzedAt) - new Date(a.analyzedAt);
+      case 'date-oldest':
+        return new Date(a.analyzedAt) - new Date(b.analyzedAt);
+      case 'rating-high':
+        return b.analysis.adjustedRating - a.analysis.adjustedRating;
+      case 'rating-low':
+        return a.analysis.adjustedRating - b.analysis.adjustedRating;
+      case 'val-high':
+        return (b.analysis.valueScore || 0) - (a.analysis.valueScore || 0);
+      case 'price-low':
+        return (a.priceData?.pricePerNight || 999999) - (b.priceData?.pricePerNight || 999999);
+      case 'price-high':
+        return (b.priceData?.pricePerNight || 0) - (a.priceData?.pricePerNight || 0);
+      default:
+        return 0;
+    }
+  });
+
+  return filtered;
+}
+
+function renderFilterControls() {
+  const librarySection = document.getElementById('library');
+  if (!librarySection) return;
+  const container = librarySection.querySelector('.container');
+
+  // Check if already exists
+  let filterBar = document.getElementById('library-filter-bar');
+  if (!filterBar) {
+    filterBar = document.createElement('div');
+    filterBar.id = 'library-filter-bar';
+    filterBar.style.cssText = 'margin-bottom: 20px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;';
+
+    // Insert before library grid (and selection controls if present)
+    const selControls = document.getElementById('selection-controls');
+    const grid = container.querySelector('.library-grid');
+
+    if (selControls) {
+      container.insertBefore(filterBar, selControls);
+    } else {
+      container.insertBefore(filterBar, grid);
+    }
+  }
+
+  // Calculate unique destinations (refresh options)
+  const destinations = [...new Set(currentHotels.map(h => h.location || 'Unknown'))].filter(d => d).sort();
+  const destOptions = destinations.map(d => `<option value="${d}" ${currentFilters.destination === d ? 'selected' : ''}>${d}</option>`).join('');
+
+  filterBar.innerHTML = `
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+      <!-- Search -->
+      <div style="flex: 1; min-width: 250px;">
+        <input type="text" id="filter-search" placeholder="Search hotels..." value="${currentFilters.search}" 
+          style="width: 100%; padding: 10px 15px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;">
+      </div>
+      
+      <!-- Sort -->
+      <div style="min-width: 200px;">
+        <select id="filter-sort" style="width: 100%; padding: 10px 15px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+          <option value="date-newest" ${currentFilters.sortBy === 'date-newest' ? 'selected' : ''}>📅 Analyzed (Newest)</option>
+          <option value="date-oldest" ${currentFilters.sortBy === 'date-oldest' ? 'selected' : ''}>📅 Analyzed (Oldest)</option>
+          <option value="rating-high" ${currentFilters.sortBy === 'rating-high' ? 'selected' : ''}>⭐ Adjusted Rating (High)</option>
+          <option value="val-high" ${currentFilters.sortBy === 'val-high' ? 'selected' : ''}>💎 Value Score (Best)</option>
+          <option value="price-low" ${currentFilters.sortBy === 'price-low' ? 'selected' : ''}>💰 Price (Low to High)</option>
+          <option value="price-high" ${currentFilters.sortBy === 'price-high' ? 'selected' : ''}>💰 Price (High to Low)</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid #edf2f7; padding-top: 15px;">
+      <!-- Filters -->
+      <select id="filter-dest" style="padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; background: white; cursor: pointer; min-width: 140px;">
+        <option value="all">📍 All Destinations</option>
+        ${destOptions}
+      </select>
+
+      <select id="filter-score" style="padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; background: white; cursor: pointer;">
+        <option value="all" ${currentFilters.valueScore === 'all' ? 'selected' : ''}>💎 All Value Scores</option>
+        <option value="high" ${currentFilters.valueScore === 'high' ? 'selected' : ''}>High Value (8+)</option>
+        <option value="good" ${currentFilters.valueScore === 'good' ? 'selected' : ''}>Good Value (6-8)</option>
+        <option value="avg" ${currentFilters.valueScore === 'avg' ? 'selected' : ''}>Avg/Low Value (<6)</option>
+      </select>
+
+      <select id="filter-price" style="padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; background: white; cursor: pointer;">
+        <option value="all" ${currentFilters.priceRange === 'all' ? 'selected' : ''}>💰 All Prices</option>
+        <option value="low" ${currentFilters.priceRange === 'low' ? 'selected' : ''}>Budget (<$150)</option>
+        <option value="med" ${currentFilters.priceRange === 'med' ? 'selected' : ''}>Mid-Range ($150-$300)</option>
+        <option value="high" ${currentFilters.priceRange === 'high' ? 'selected' : ''}>Luxury (>$300)</option>
+      </select>
+      
+      <div style="flex: 1;"></div>
+      <button id="reset-filters" style="padding: 8px 16px; background: transparent; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; color: #718096; cursor: pointer; transition: all 0.2s;">
+        Reset
+      </button>
+    </div>
+  `;
+
+  attachFilterListeners();
+}
+
+function attachFilterListeners() {
+  const searchInput = document.getElementById('filter-search');
+  const sortSelect = document.getElementById('filter-sort');
+  const destSelect = document.getElementById('filter-dest');
+  const scoreSelect = document.getElementById('filter-score');
+  const priceSelect = document.getElementById('filter-price');
+  const resetBtn = document.getElementById('reset-filters');
+
+  if (searchInput) searchInput.oninput = (e) => { currentFilters.search = e.target.value; updateLibraryView(); };
+  if (sortSelect) sortSelect.onchange = (e) => { currentFilters.sortBy = e.target.value; updateLibraryView(); };
+  if (destSelect) destSelect.onchange = (e) => { currentFilters.destination = e.target.value; updateLibraryView(); };
+  if (scoreSelect) scoreSelect.onchange = (e) => { currentFilters.valueScore = e.target.value; updateLibraryView(); };
+  if (priceSelect) priceSelect.onchange = (e) => { currentFilters.priceRange = e.target.value; updateLibraryView(); };
+
+  if (resetBtn) resetBtn.onclick = () => {
+    currentFilters = { search: '', destination: 'all', valueScore: 'all', priceRange: 'all', sortBy: 'date-newest' };
+
+    if (searchInput) searchInput.value = '';
+    if (sortSelect) sortSelect.value = 'date-newest';
+    if (destSelect) destSelect.value = 'all';
+    if (scoreSelect) scoreSelect.value = 'all';
+    if (priceSelect) priceSelect.value = 'all';
+
+    updateLibraryView();
+  };
+}
+
+function updateLibraryView() {
+  const filteredHotels = getFilteredAndSortedHotels();
+  renderLibraryGrid(filteredHotels);
+
+  // Update selection count text if needed
+  updateSelectionState();
+}
+
 function renderLibrary(hotels) {
   const grid = document.querySelector('.library-grid');
   if (!grid) return;
 
-  if (hotels.length === 0) {
-    // Hide selection controls when no hotels
+  // If the TOTAL list is empty, show the "Get Started" empty state
+  if (currentHotels.length === 0) {
+    // Hide controls
     const selectionControls = document.getElementById('selection-controls');
+    const filterBar = document.getElementById('library-filter-bar');
     if (selectionControls) selectionControls.style.display = 'none';
+    if (filterBar) filterBar.style.display = 'none';
 
     grid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; background: white; border-radius: 12px; border: 2px dashed #cbd5e0;">
@@ -461,8 +651,39 @@ function renderLibrary(hotels) {
     return;
   }
 
-  // Show selection controls when hotels exist
+  // If we have hotels, show controls and render the current view
+  renderFilterControls();
   renderSelectionControls();
+  updateLibraryView();
+}
+
+function renderLibraryGrid(hotels) {
+  const grid = document.querySelector('.library-grid');
+  if (!grid) return;
+
+  // If filtered list is empty (but total list is not), show "No matches"
+  if (hotels.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #718096;">
+        <div style="font-size: 40px; margin-bottom: 15px;">🔍</div>
+        <h3 style="font-size: 18px; margin-bottom: 10px; color: #2d3748;">No hotels match your filters</h3>
+        <p style="margin-bottom: 20px;">Try adjusting your search or filters to see more results.</p>
+        <button id="clear-filters-btn" style="padding: 8px 16px; background: white; border: 1px solid #cbd5e0; border-radius: 6px; font-weight: 500; cursor: pointer; color: #4a5568; transition: all 0.2s;">
+          Clear All Filters
+        </button>
+      </div>
+    `;
+
+    // Attach listener to the clear button inside grid
+    const clearBtn = document.getElementById('clear-filters-btn');
+    if (clearBtn) {
+      clearBtn.onclick = () => {
+        const resetBtn = document.getElementById('reset-filters');
+        if (resetBtn) resetBtn.click();
+      };
+    }
+    return;
+  }
 
   grid.innerHTML = hotels.map(hotel => {
     // Calculate deviation status
@@ -494,8 +715,8 @@ function renderLibrary(hotels) {
       ? `${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}`
       : 'Price N/A';
 
-    // Get value score from analysis (1-10 scale from AI)
-    // Only show if we have price data, otherwise it's meaningless
+    // Get value score from analysis
+    // Only show if we have price data
     const valueScore = (hotel.priceData && hotel.analysis.valueScore)
       ? `${hotel.analysis.valueScore}/10`
       : null;
