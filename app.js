@@ -721,8 +721,20 @@ function renderLibraryGrid(hotels) {
       ? `${hotel.analysis.valueScore}/10`
       : null;
 
-    // Get trends information
-    const trendsText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No trend data available';
+    // Generate Key Insight (One-line summary)
+    let insightText = '';
+    const strengths = hotel.analysis.keyStrengths;
+    const issues = hotel.analysis.keyIssues;
+
+    if (Array.isArray(strengths) && strengths.length > 0 && Array.isArray(issues) && issues.length > 0) {
+      insightText = `${strengths[0].strength}, but ${issues[0].issue}`;
+    } else if (Array.isArray(strengths) && strengths.length > 0) {
+      insightText = strengths[0].strength;
+    } else if (Array.isArray(issues) && issues.length > 0) {
+      insightText = issues[0].issue;
+    } else {
+      insightText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No specific insights available';
+    }
 
     return `
     <article class="hotel-card" data-hotel-id="${hotel.hotelId}">
@@ -752,6 +764,7 @@ function renderLibraryGrid(hotels) {
             <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Adjusted Score</div>
             <div style="font-size: 16px; font-weight: bold; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</div>
             <div style="font-size: 10px; margin-top: 2px; font-style: italic; color: ${devColor};">${deviationText}</div>
+            ${hotel.reviewCount ? `<div style="font-size: 10px; color: #a0aec0; margin-top: 2px;">Based on ${hotel.reviewCount} reviews</div>` : ''}
           </div>
         </div>
 
@@ -768,8 +781,9 @@ function renderLibraryGrid(hotels) {
           ` : ''}
         </div>
 
-        <div style="margin-bottom: 12px; background: #f7fafc; padding: 8px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: #4a5568;">
-          <strong>Trend:</strong> ${trendsText}
+        <div style="margin-bottom: 12px; background: #fdf2f8; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #702459; display: flex; align-items: start; gap: 6px; border: 1px solid #fbcfe8;">
+          <span style="font-size: 14px;">💡</span>
+          <span style="font-weight: 500;">${insightText}</span>
         </div>
 
         <a href="${hotel.url}" target="_blank" style="display: block; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s;">
@@ -959,78 +973,117 @@ function populateCompareSlot(slotId, hotel) {
   if (!slot) return;
 
   const cleanName = cleanHotelName(hotel.hotelName);
-  const diff = hotel.analysis.adjustedRating - hotel.originalRating;
-  let deviationText = 'Accurate rating';
-  let devColor = '#718096';
 
-  if (diff < -1.0) { deviationText = 'Major rating inflation'; devColor = '#e53e3e'; }
-  else if (diff < -0.5) { deviationText = 'Minor rating inflation'; devColor = '#dd6b20'; }
-  else if (diff > 0.5) { deviationText = 'Better than rated'; devColor = '#38a169'; }
+  // Extract top issues and strengths
+  const topIssues = hotel.analysis.keyIssues ? hotel.analysis.keyIssues.slice(0, 3) : [];
+  const topStrengths = hotel.analysis.keyStrengths ? hotel.analysis.keyStrengths.slice(0, 3) : [];
 
-  // Format price information
+  // Format Price
   const priceInfo = hotel.priceData
-    ? `${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}`
-    : 'Price N/A';
+    ? `<div class="price-value">${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}</div><div class="price-sub">/night</div>`
+    : '<div class="price-value">N/A</div>';
 
-  // Get value score from analysis
+  // Format Value Score
   const valueScore = (hotel.priceData && hotel.analysis.valueScore)
-    ? `${hotel.analysis.valueScore}/10`
-    : null;
+    ? `<div class="value-score-num">${hotel.analysis.valueScore}</div><div class="value-sub">/10</div>`
+    : '<div class="value-score-num">-</div>';
 
-  // Get trends information
-  const trendsText = hotel.analysis.trends || hotel.analysis.commonComplaints || 'No trend data available';
+  // Trends Logic
+  const trendText = hotel.analysis.trends || 'No distinct trend data available';
+  let trendStatus = 'Stable';
+  let trendIcon = '➡️';
+  let trendClass = 'trend-stable';
 
+  const lowerTrend = trendText.toLowerCase();
+  if (lowerTrend.includes('declin') || lowerTrend.includes('worse') || lowerTrend.includes('deterior') || lowerTrend.includes('drop')) {
+    trendStatus = 'Declining';
+    trendIcon = '↘️';
+    trendClass = 'trend-declining';
+  } else if (lowerTrend.includes('improv') || lowerTrend.includes('better') || lowerTrend.includes('upgrad') || lowerTrend.includes('renovat')) {
+    trendStatus = 'Improving';
+    trendIcon = '↗️';
+    trendClass = 'trend-improving';
+  }
+
+  // Image
   const imageHTML = hotel.imageUrl
-    ? `<img src="${hotel.imageUrl}" alt="${cleanName}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">`
-    : `<div style="width: 100%; height: 200px; background: #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;">🏨</div>`;
+    ? `<img src="${hotel.imageUrl}" alt="${cleanName}" class="compare-card-image">`
+    : `<div class="compare-card-image-placeholder">🏨</div>`;
 
   slot.innerHTML = `
-    <div style="text-align: left; width: 100%;">
-      ${imageHTML}
-      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cleanName}">${cleanName}</h3>
-      <p style="margin-bottom: 12px; font-size: 14px; color: #718096;">📍 ${hotel.location || 'Unknown'}</p>
-
-      <div style="margin-bottom: 15px; padding: 12px; background: #f7fafc; border-radius: 6px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #4a5568; font-size: 14px;">Listed Score:</span>
-          <span style="font-weight: bold; font-size: 16px;">${Number(hotel.originalRating).toFixed(1)}</span>
+    <div class="compare-card-inner">
+      <div class="compare-header">
+        ${imageHTML}
+        <div class="compare-title-row">
+          <h3 title="${cleanName}">${cleanName}</h3>
+          <button onclick="clearCompareSlot('${slotId}')" class="compare-remove-btn" title="Remove">×</button>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-          <span style="color: #4a5568; font-size: 14px;">Adjusted Score:</span>
-          <span style="font-weight: bold; font-size: 16px; ${getScoreStyle(hotel.analysis.adjustedRating)}">${hotel.analysis.adjustedRating.toFixed(1)}</span>
-        </div>
-        <div style="font-size: 11px; font-style: italic; color: ${devColor}; text-align: right;">${deviationText}</div>
       </div>
 
-      <div style="display: grid; grid-template-columns: ${valueScore ? '1fr 1fr' : '1fr'}; gap: 8px; margin-bottom: 15px;">
-        <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
-          <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Price/Night</div>
-          <div style="font-size: 14px; font-weight: 600;">${priceInfo}</div>
+      <div class="compare-metrics">
+        <div class="compare-metric-row">
+          <div class="metric-label">Rating</div>
+          <div class="metric-values rating-comparison">
+             <span class="listed-rating" title="Listed">${Number(hotel.originalRating).toFixed(1)}</span>
+             <span class="rating-arrow">→</span>
+             <span class="adjusted-rating" style="background-color: ${getRatingColorBox(hotel.analysis.adjustedRating)};" title="Adjusted">${hotel.analysis.adjustedRating.toFixed(1)}</span>
+          </div>
         </div>
-        ${valueScore ? `
-        <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
-          <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Value Score</div>
-          <div style="font-size: 14px; font-weight: 600; color: #009A8E;">${valueScore}</div>
+
+        <div class="compare-metric-row">
+          <div class="metric-label">Price</div>
+          <div class="metric-values">${priceInfo}</div>
         </div>
-        ` : ''}
+
+        <div class="compare-metric-row">
+          <div class="metric-label">Value</div>
+          <div class="metric-values value-container">${valueScore}</div>
+        </div>
+
+        <div class="compare-metric-row">
+          <div class="metric-label">Trend</div>
+          <div class="metric-values">
+            <div class="trend-badge ${trendClass}" title="${trendText}">
+              ${trendIcon} ${trendStatus}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style="margin-bottom: 15px; background: #f7fafc; padding: 10px; border-radius: 4px; font-size: 12px; line-height: 1.5; color: #4a5568;">
-        <strong>Trend:</strong> ${trendsText}
+      <div class="compare-features">
+        <div class="feature-block strengths">
+          <h4>Top Strengths</h4>
+          ${topStrengths.length > 0 ? `
+            <ul>
+              ${topStrengths.map(s => `<li>${s.strength || s}</li>`).join('')}
+            </ul>
+          ` : '<p class="no-data">None detected</p>'}
+        </div>
+
+        <div class="feature-block issues">
+          <h4>Top Issues</h4>
+          ${topIssues.length > 0 ? `
+            <ul>
+              ${topIssues.map(i => `<li>${i.issue || i}</li>`).join('')}
+            </ul>
+          ` : '<p class="no-data">None detected</p>'}
+        </div>
       </div>
 
-      <a href="${hotel.url}" target="_blank" style="display: block; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s; margin-bottom: 8px;">
-        View on ${getOTAName(hotel.url)}
+      <a href="${hotel.url}" target="_blank" class="compare-cta">
+        View Deal ↗
       </a>
-
-      <button onclick="clearCompareSlot('${slotId}')" style="width: 100%; padding: 8px; background: #e2e8f0; color: #2d3748; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
-        Remove
-      </button>
     </div>
   `;
 
   slot.className = 'compare-filled';
   slot.dataset.hotelId = hotel.hotelId;
+}
+
+function getRatingColorBox(rating) {
+  if (rating >= 8) return '#009A8E';
+  if (rating >= 6) return '#dd6b20';
+  return '#e53e3e';
 }
 
 function renderRecommendation(hotels) {
