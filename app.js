@@ -1126,41 +1126,71 @@ function renderRecommendation(hotels) {
   }
 
   // Calculate scores and find winner
-  // Logic: Score = AdjustedRating + (ValueScore * 0.5)
-  // Max score ≈ 10 + 5 = 15
+  // New Logic: Score = AdjustedRating - (Penalty * Delta)
+  // Penalty = 0.3 per point of difference.
   const rankedHotels = hotels.map(hotel => {
-    const rating = hotel.analysis.adjustedRating || 0;
-    const score = rating;
-    return { ...hotel, score };
+    const original = hotel.originalRating || 0;
+    const adjusted = hotel.analysis.adjustedRating || 0;
+    const delta = Math.max(0, original - adjusted); // Only penalize drops
+
+    // Penalize fake/inflated ratings
+    const penalty = delta * 0.3;
+    const score = adjusted - penalty;
+
+    return { ...hotel, score, delta };
   }).sort((a, b) => b.score - a.score);
 
   const winner = rankedHotels[0];
   const cleanName = cleanHotelName(winner.hotelName);
 
+  // Determine Text & Warnings
+  const highDelta = winner.delta > 0.5;
+
+  let headline = "Highest quality & most trustworthy.";
+  let description = "This hotel has the best balance of high quality and reliable reviews.";
+  let warningHTML = '';
+
+  if (highDelta) {
+    headline = "Highest quality rating.";
+    description = "It has the best underlying quality, though the listed rating is inflated.";
+    warningHTML = `
+      <div style="margin-top: 12px; font-size: 13px; color: #b7791f; background: #fffaf0; border: 1px solid #fbd38d; padding: 8px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+        <span>⚠️</span> 
+        <span><strong>Note:</strong> Reviews show mixed signals. Check recent feedback.</span>
+      </div>
+    `;
+  }
+
   container.style.display = 'block';
   container.innerHTML = `
-    <div style="background: #f0fdfa; border: 1px solid #ccfbf1; color: #2d3748; padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-      <div style="position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.05;">🏆</div>
+    <div style="background: #f0fdfa; border: 1px solid #ccfbf1; color: #2d3748; padding: 24px; border-radius: 12px; position: relative; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+      <div style="position: absolute; top: -10px; right: -10px; font-size: 120px; opacity: 0.05; pointer-events: none;">🏆</div>
       
-      <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-        <div style="flex: 1;">
-          <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; color: #009A8E;">Unmask Recommends</div>
-          <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 5px; color: #1a202c;">${cleanName}</h3>
-            Based on our analysis, this hotel offers the highest adjusted quality rating among your selection.
-          </p>
-        </div>
-        
-        <div style="display: flex; gap: 15px;">
-          <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 12px; color: #718096;">Adjusted Quality</div>
-            <div style="font-size: 20px; font-weight: 700; color: #2d3748;">${winner.analysis.adjustedRating.toFixed(1)}</div>
+      <div style="position: relative; z-index: 1; display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 280px;">
+          <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; color: #009A8E; display: flex; align-items: center; gap: 6px;">
+            <span style="background: #009A8E; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">TOP PICK</span>
+            UNMASK RECOMMENDS
           </div>
-
+          <h3 style="font-size: 26px; font-weight: 700; margin-bottom: 8px; color: #1a202c; line-height: 1.2;">${cleanName}</h3>
+          <p style="font-size: 16px; color: #4a5568; line-height: 1.6; max-width: 600px;">
+            ${description}
+          </p>
+          ${warningHTML}
         </div>
         
-        <a href="${winner.url}" target="_blank" style="background: #009A8E; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 4px rgba(0,154,142,0.2); transition: transform 0.2s;">
-          Book Now ↗
-        </a>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+           <div style="display: flex; gap: 15px;">
+            <div style="background: white; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px; text-align: center; min-width: 100px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 2px;">True Quality</div>
+              <div style="font-size: 24px; font-weight: 700; color: #2d3748;">${winner.analysis.adjustedRating.toFixed(1)}<span style="font-size: 14px; color: #a0aec0; font-weight: 500;">/10</span></div>
+            </div>
+           </div>
+          
+          <a href="${winner.url}" target="_blank" style="background: #009A8E; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px rgba(0,154,142,0.2); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;">
+            View Deal ↗
+          </a>
+        </div>
       </div>
     </div>
   `;
