@@ -15,6 +15,9 @@ function initHeaderAnimations() {
       item.classList.add('flexIn');
     });
 
+    // Initialize Secret Listener
+    setupSecretListener();
+
     // Animate CTA button
     const ctaAction = document.querySelector('.header-actions-action');
     if (ctaAction) {
@@ -852,6 +855,9 @@ function renderSelectionControls() {
       <button id="delete-selected-btn" style="padding: 8px 16px; background: #e53e3e; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; opacity: 0.5; pointer-events: none;" disabled>
         Delete Selected
       </button>
+      <button id="export-ai-btn" style="padding: 8px 16px; background: #805ad5; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: none;">
+        Export for AI ✨
+      </button>
     `;
 
     // Insert before the library grid
@@ -893,6 +899,12 @@ function attachControlListeners() {
   if (deleteBtn) {
     deleteBtn.removeEventListener('click', deleteSelected);
     deleteBtn.addEventListener('click', deleteSelected);
+  }
+
+  const exportBtn = document.getElementById('export-ai-btn');
+  if (exportBtn) {
+    exportBtn.removeEventListener('click', exportSelected);
+    exportBtn.addEventListener('click', exportSelected);
   }
 }
 
@@ -1287,4 +1299,96 @@ function updateEmptyStates() {
       compareEmptyState.style.display = 'none';
     }
   }
+}
+
+// ===== SECRET EXPORT FEATURE =====
+
+function setupSecretListener() {
+  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konamiIndex = 0;
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === konamiCode[konamiIndex]) {
+      konamiIndex++;
+      if (konamiIndex === konamiCode.length) {
+        activateSecretMode();
+        konamiIndex = 0;
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  });
+}
+
+function activateSecretMode() {
+  const exportBtn = document.getElementById('export-ai-btn');
+  if (exportBtn) {
+    exportBtn.style.display = 'block';
+
+    // Animate button
+    exportBtn.animate([
+      { transform: 'scale(0.8)', opacity: 0 },
+      { transform: 'scale(1.1)', opacity: 1 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], {
+      duration: 500,
+      easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+    });
+
+    alert('✨ Secret Mode Activated: Export for AI is now available!');
+  }
+}
+
+function exportSelected() {
+  const checkedBoxes = document.querySelectorAll('.hotel-checkbox:checked');
+  let hotelsToExport = [];
+
+  if (checkedBoxes.length > 0) {
+    // Export selected
+    const hotelIds = Array.from(checkedBoxes).map(cb => cb.dataset.hotelId);
+    hotelsToExport = currentHotels.filter(h => hotelIds.includes(h.hotelId));
+  } else {
+    // If nothing selected, export ALL
+    if (!confirm('No hotels selected. Export ALL hotels?')) return;
+    hotelsToExport = currentHotels;
+  }
+
+  if (hotelsToExport.length === 0) {
+    alert('No hotels to export.');
+    return;
+  }
+
+  // Format for AI
+  const exportData = hotelsToExport.map(h => ({
+    name: h.hotelName,
+    location: h.location || "Unknown",
+    scores: {
+      listed: Number(h.originalRating),
+      adjusted: Number(h.analysis.adjustedRating),
+      accuracy_percent: Math.round((1 - (Math.max(0, h.originalRating - h.analysis.adjustedRating) / 10)) * 100)
+    },
+    price_per_night: h.priceData ? `${h.priceData.currency} ${h.priceData.pricePerNight}` : "N/A",
+    ai_analysis: {
+      summary: h.analysis.recommendation,
+      top_strengths: h.analysis.keyStrengths ? h.analysis.keyStrengths.map(s => s.strength) : [],
+      key_issues: h.analysis.keyIssues ? h.analysis.keyIssues.map(i => i.issue) : [],
+      trend: h.analysis.trends
+    },
+    url: h.url
+  }));
+
+  const jsonString = JSON.stringify(exportData, null, 2);
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(jsonString).then(() => {
+    const originalText = document.getElementById('export-ai-btn').textContent;
+    document.getElementById('export-ai-btn').textContent = 'Copied! ✅';
+    setTimeout(() => {
+      document.getElementById('export-ai-btn').textContent = originalText;
+    }, 2000);
+    alert(`Successfully copied ${hotelsToExport.length} hotels to clipboard!`);
+  }).catch(err => {
+    console.error('Failed to copy text: ', err);
+    alert('Failed to copy to clipboard. Check console.');
+  });
 }
