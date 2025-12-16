@@ -794,7 +794,7 @@ function renderLibraryGrid(hotels) {
             <span style="font-weight: 500;">${insightText}</span>
           </div>
 
-          <a href="${hotel.url || '#'}" target="_blank" style="display: block; text-align: center; font-size: 14px; font-weight: 600; color: #009A8E; text-decoration: none; border: 1px solid #009A8E; padding: 8px; border-radius: 4px; transition: all 0.2s;">
+          <a href="${hotel.url || '#'}" target="_blank" class="hotel-card-cta">
             View on ${getOTAName(hotel.url || '')}
           </a>
         </div>
