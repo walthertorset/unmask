@@ -181,8 +181,7 @@ let currentHotels = [];
 let currentFilters = {
   search: '',
   destination: 'all',
-  valueScore: 'all',
-  priceRange: 'all',
+
   sortBy: 'date-newest'
 };
 
@@ -461,17 +460,7 @@ function getFilteredAndSortedHotels() {
     });
   }
 
-  // 3. Filter by Value Score
-  if (currentFilters.valueScore !== 'all') {
-    filtered = filtered.filter(h => {
-      const score = h.analysis.valueScore; // 1-10
-      if (!score) return false;
-      if (currentFilters.valueScore === 'high') return score >= 8;
-      if (currentFilters.valueScore === 'good') return score >= 6 && score < 8;
-      if (currentFilters.valueScore === 'avg') return score < 6;
-      return true;
-    });
-  }
+
 
   // 4. Filter by Price Range
   if (currentFilters.priceRange !== 'all') {
@@ -496,8 +485,7 @@ function getFilteredAndSortedHotels() {
         return b.analysis.adjustedRating - a.analysis.adjustedRating;
       case 'rating-low':
         return a.analysis.adjustedRating - b.analysis.adjustedRating;
-      case 'val-high':
-        return (b.analysis.valueScore || 0) - (a.analysis.valueScore || 0);
+
       case 'price-low':
         return (a.priceData?.pricePerNight || 999999) - (b.priceData?.pricePerNight || 999999);
       case 'price-high':
@@ -551,7 +539,7 @@ function renderFilterControls() {
           <option value="date-newest" ${currentFilters.sortBy === 'date-newest' ? 'selected' : ''}>📅 Analyzed (Newest)</option>
           <option value="date-oldest" ${currentFilters.sortBy === 'date-oldest' ? 'selected' : ''}>📅 Analyzed (Oldest)</option>
           <option value="rating-high" ${currentFilters.sortBy === 'rating-high' ? 'selected' : ''}>⭐ Adjusted Rating (High)</option>
-          <option value="val-high" ${currentFilters.sortBy === 'val-high' ? 'selected' : ''}>💎 Value Score (Best)</option>
+
           <option value="price-low" ${currentFilters.sortBy === 'price-low' ? 'selected' : ''}>💰 Price (Low to High)</option>
           <option value="price-high" ${currentFilters.sortBy === 'price-high' ? 'selected' : ''}>💰 Price (High to Low)</option>
         </select>
@@ -565,12 +553,7 @@ function renderFilterControls() {
         ${destOptions}
       </select>
 
-      <select id="filter-score" style="padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; background: white; cursor: pointer;">
-        <option value="all" ${currentFilters.valueScore === 'all' ? 'selected' : ''}>💎 All Value Scores</option>
-        <option value="high" ${currentFilters.valueScore === 'high' ? 'selected' : ''}>High Value (8+)</option>
-        <option value="good" ${currentFilters.valueScore === 'good' ? 'selected' : ''}>Good Value (6-8)</option>
-        <option value="avg" ${currentFilters.valueScore === 'avg' ? 'selected' : ''}>Avg/Low Value (<6)</option>
-      </select>
+
 
       <select id="filter-price" style="padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; background: white; cursor: pointer;">
         <option value="all" ${currentFilters.priceRange === 'all' ? 'selected' : ''}>💰 All Prices</option>
@@ -593,23 +576,23 @@ function attachFilterListeners() {
   const searchInput = document.getElementById('filter-search');
   const sortSelect = document.getElementById('filter-sort');
   const destSelect = document.getElementById('filter-dest');
-  const scoreSelect = document.getElementById('filter-score');
+
   const priceSelect = document.getElementById('filter-price');
   const resetBtn = document.getElementById('reset-filters');
 
   if (searchInput) searchInput.oninput = (e) => { currentFilters.search = e.target.value; updateLibraryView(); };
   if (sortSelect) sortSelect.onchange = (e) => { currentFilters.sortBy = e.target.value; updateLibraryView(); };
   if (destSelect) destSelect.onchange = (e) => { currentFilters.destination = e.target.value; updateLibraryView(); };
-  if (scoreSelect) scoreSelect.onchange = (e) => { currentFilters.valueScore = e.target.value; updateLibraryView(); };
+
   if (priceSelect) priceSelect.onchange = (e) => { currentFilters.priceRange = e.target.value; updateLibraryView(); };
 
   if (resetBtn) resetBtn.onclick = () => {
-    currentFilters = { search: '', destination: 'all', valueScore: 'all', priceRange: 'all', sortBy: 'date-newest' };
+    currentFilters = { search: '', destination: 'all', priceRange: 'all', sortBy: 'date-newest' };
 
     if (searchInput) searchInput.value = '';
     if (sortSelect) sortSelect.value = 'date-newest';
     if (destSelect) destSelect.value = 'all';
-    if (scoreSelect) scoreSelect.value = 'all';
+
     if (priceSelect) priceSelect.value = 'all';
 
     updateLibraryView();
@@ -725,11 +708,7 @@ function renderLibraryGrid(hotels) {
         ? `${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}`
         : 'Price N/A';
 
-      // Get value score from analysis
-      // Only show if we have price data
-      const valueScore = (hotel.priceData && hotel.analysis.valueScore)
-        ? `${hotel.analysis.valueScore}/10`
-        : null;
+
 
       // Generate Key Insight (One-line summary)
       let insightText = '';
@@ -803,17 +782,11 @@ function renderLibraryGrid(hotels) {
             ${hotel.reviewCount ? `<div style="font-size: 10px; color: #a0aec0; margin-top: 6px; text-align: center;">Based on ${hotel.reviewCount} reviews</div>` : ''}
           </div>
 
-          <div style="display: grid; grid-template-columns: ${valueScore ? '1fr 1fr' : '1fr'}; gap: 8px; margin-bottom: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px;">
             <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
               <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Price/Night</div>
               <div style="font-size: 14px; font-weight: 600;">${priceInfo}</div>
             </div>
-            ${valueScore ? `
-            <div style="background: #f7fafc; padding: 8px; border-radius: 4px;">
-              <div style="font-size: 11px; color: #718096; margin-bottom: 2px;">Value Score</div>
-              <div style="font-size: 14px; font-weight: 600; color: #009A8E;">${valueScore}</div>
-            </div>
-            ` : ''}
           </div>
 
           <div style="margin-bottom: 12px; background: #f8fafc; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4; color: #4a5568; display: flex; align-items: start; gap: 6px; border: 1px solid #e2e8f0;">
@@ -1041,10 +1014,7 @@ function populateCompareSlot(slotId, hotel) {
     ? `<div class="price-value">${hotel.priceData.currency} ${hotel.priceData.pricePerNight.toLocaleString()}</div><div class="price-sub">/night</div>`
     : '<div class="price-value">N/A</div>';
 
-  // Format Value Score
-  const valueScore = (hotel.priceData && hotel.analysis.valueScore)
-    ? `<div class="value-score-num">${hotel.analysis.valueScore}</div><div class="value-sub">/10</div>`
-    : '<div class="value-score-num">-</div>';
+
 
   // Trends Logic
   const trendText = hotel.analysis.trends || 'No distinct trend data available';
@@ -1096,10 +1066,7 @@ function populateCompareSlot(slotId, hotel) {
           <div class="metric-values">${priceInfo}</div>
         </div>
 
-        <div class="compare-metric-row">
-          <div class="metric-label">Value</div>
-          <div class="metric-values value-container">${valueScore}</div>
-        </div>
+
 
         <div class="compare-metric-row">
           <div class="metric-label">Trend</div>
@@ -1163,8 +1130,7 @@ function renderRecommendation(hotels) {
   // Max score ≈ 10 + 5 = 15
   const rankedHotels = hotels.map(hotel => {
     const rating = hotel.analysis.adjustedRating || 0;
-    const value = hotel.analysis.valueScore || 5; // Default to middle if missing
-    const score = rating + (value * 0.5);
+    const score = rating;
     return { ...hotel, score };
   }).sort((a, b) => b.score - a.score);
 
@@ -1190,10 +1156,7 @@ function renderRecommendation(hotels) {
             <div style="font-size: 12px; color: #718096;">Adjusted Quality</div>
             <div style="font-size: 20px; font-weight: 700; color: #2d3748;">${winner.analysis.adjustedRating.toFixed(1)}</div>
           </div>
-          <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 12px; color: #718096;">Value Score</div>
-            <div style="font-size: 20px; font-weight: 700; color: #009A8E;">${winner.analysis.valueScore || 'N/A'}/10</div>
-          </div>
+
         </div>
         
         <a href="${winner.url}" target="_blank" style="background: #009A8E; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 4px rgba(0,154,142,0.2); transition: transform 0.2s;">
