@@ -1147,12 +1147,12 @@ function renderRecommendation(hotels) {
   const highDelta = winner.delta > 0.5;
 
   let headline = "Highest quality & most trustworthy.";
-  let description = "This hotel has the best balance of high quality and reliable reviews.";
+  let description = "Selected because it has the highest adjusted quality score and best listing accuracy.";
   let warningHTML = '';
 
   if (highDelta) {
     headline = "Highest quality rating.";
-    description = "It has the best underlying quality, though the listed rating is inflated.";
+    description = "Selected for its high adjusted score, though we detected a drop from the listed rating.";
     warningHTML = `
       <div style="margin-top: 12px; font-size: 13px; color: #b7791f; background: #fffaf0; border: 1px solid #fbd38d; padding: 8px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
         <span>⚠️</span> 
@@ -1179,14 +1179,7 @@ function renderRecommendation(hotels) {
           ${warningHTML}
         </div>
         
-        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
-           <div style="display: flex; gap: 15px;">
-            <div style="background: white; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px; text-align: center; min-width: 100px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 2px;">True Quality</div>
-              <div style="font-size: 24px; font-weight: 700; color: #2d3748;">${winner.analysis.adjustedRating.toFixed(1)}<span style="font-size: 14px; color: #a0aec0; font-weight: 500;">/10</span></div>
-            </div>
-           </div>
-          
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px; align-self: center;"> 
           <a href="${winner.url}" target="_blank" style="background: #009A8E; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px rgba(0,154,142,0.2); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;">
             View Deal ↗
           </a>
