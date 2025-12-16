@@ -1146,8 +1146,7 @@ function renderRecommendation(hotels) {
         <div style="flex: 1;">
           <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 5px; color: #009A8E;">Unmask Recommends</div>
           <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 5px; color: #1a202c;">${cleanName}</h3>
-          <p style="font-size: 15px; color: #4a5568; max-width: 600px;">
-            Based on our analysis, this hotel offers the best combination of quality and value among your selection.
+            Based on our analysis, this hotel offers the highest adjusted quality rating among your selection.
           </p>
         </div>
         
