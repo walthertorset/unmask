@@ -1170,7 +1170,6 @@ function renderRecommendation(hotels) {
         <div style="flex: 1; min-width: 280px;">
           <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; color: #009A8E; display: flex; align-items: center; gap: 6px;">
             <span style="background: #009A8E; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px;">TOP PICK</span>
-            UNMASK RECOMMENDS
           </div>
           <h3 style="font-size: 26px; font-weight: 700; margin-bottom: 8px; color: #1a202c; line-height: 1.2;">${cleanName}</h3>
           <p style="font-size: 16px; color: #4a5568; line-height: 1.6; max-width: 600px;">
@@ -1180,6 +1179,16 @@ function renderRecommendation(hotels) {
         </div>
         
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px; align-self: center;"> 
+           <div style="display: flex; gap: 12px;">
+            <div style="background: white; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 8px; text-align: center; min-width: 90px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 2px;">Adjusted</div>
+              <div style="font-size: 18px; font-weight: 700; color: #2d3748;">${winner.analysis.adjustedRating.toFixed(1)}</div>
+            </div>
+            <div style="background: white; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 8px; text-align: center; min-width: 90px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 2px;">Accuracy</div>
+              <div style="font-size: 18px; font-weight: 700; color: #38a169;">${Math.max(0, Math.round((1 - (winner.delta / (winner.originalRating || 10))) * 100))}%</div>
+            </div>
+           </div>
           <a href="${winner.url}" target="_blank" style="background: #009A8E; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 6px rgba(0,154,142,0.2); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;">
             View Deal ↗
           </a>
