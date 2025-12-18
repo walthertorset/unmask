@@ -1304,11 +1304,12 @@ function updateEmptyStates() {
 // ===== SECRET EXPORT FEATURE =====
 
 function setupSecretListener() {
-  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  const konamiCode = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
   let konamiIndex = 0;
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === konamiCode[konamiIndex]) {
+    const key = e.key.toLowerCase();
+    if (key === konamiCode[konamiIndex]) {
       konamiIndex++;
       if (konamiIndex === konamiCode.length) {
         activateSecretMode();
@@ -1321,7 +1322,22 @@ function setupSecretListener() {
 }
 
 function activateSecretMode() {
-  const exportBtn = document.getElementById('export-ai-btn');
+  // Always give feedback first
+  alert('✨ Secret Mode Activated: Export for AI is now enabled!');
+
+  let exportBtn = document.getElementById('export-ai-btn');
+
+  // If button doesn't exist, it might be because the library hasn't rendered its controls yet (e.g. empty library)
+  if (!exportBtn) {
+    if (document.getElementById('library')) {
+      renderSelectionControls();
+      exportBtn = document.getElementById('export-ai-btn');
+    } else {
+      alert('Note: Please go to the Dashboard page to use the Export feature.');
+      return;
+    }
+  }
+
   if (exportBtn) {
     exportBtn.style.display = 'block';
 
@@ -1334,8 +1350,6 @@ function activateSecretMode() {
       duration: 500,
       easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
     });
-
-    alert('✨ Secret Mode Activated: Export for AI is now available!');
   }
 }
 
