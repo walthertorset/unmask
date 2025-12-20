@@ -188,12 +188,45 @@ let currentFilters = {
   sortBy: 'date-newest'
 };
 
+// ===== CAROUSEL FUNCTIONALITY =====
+
+function initCarousel() {
+  const grid = document.querySelector('.analyzed-grid');
+  const prevBtn = document.querySelector('.prev-btn');
+  const nextBtn = document.querySelector('.next-btn');
+
+  if (!grid || !prevBtn || !nextBtn) return;
+
+  // Calculate scroll amount (3 cards + gaps)
+  // We can just scroll by width of container to show next "page"
+  const getScrollAmount = () => {
+    return grid.clientWidth;
+  };
+
+  nextBtn.addEventListener('click', () => {
+    grid.scrollBy({
+      left: getScrollAmount(),
+      behavior: 'smooth'
+    });
+  });
+
+  prevBtn.addEventListener('click', () => {
+    grid.scrollBy({
+      left: -getScrollAmount(),
+      behavior: 'smooth'
+    });
+  });
+}
+
 // ===== INITIALIZE ALL FUNCTIONALITY ON PAGE LOAD =====
 document.addEventListener('DOMContentLoaded', function () {
   console.log('Page loaded, initializing...');
 
   // Initialize header animations
   initHeaderAnimations();
+
+  // Initialize carousel
+  initCarousel();
 
   // Initialize extension integration (only on dashboard page)
   if (document.getElementById('library')) {

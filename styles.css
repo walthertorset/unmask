@@ -538,13 +538,31 @@ img {
   border-top: 1px solid var(--color-border);
 }
 
+.carousel-wrapper {
+  position: relative;
+  overflow: hidden;
+  padding: 0 4px;
+  /* Tiny padding to prevent shadow clipping */
+}
+
 .analyzed-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
   gap: 24px;
+  padding-bottom: 24px;
+  /* Hide scrollbar for standard browsers */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.analyzed-grid::-webkit-scrollbar {
+  display: none;
 }
 
 .analyzed-hotel-card {
+  /* Show exactly 3 cards minus gap space */
+  flex: 0 0 calc((100% - 48px) / 3);
   background: var(--color-white);
   border-radius: 12px;
   overflow: hidden;
@@ -553,6 +571,54 @@ img {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  color: var(--color-primary);
+  font-size: 20px;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+}
+
+.carousel-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  opacity: 1;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.prev-btn {
+  left: 0;
+}
+
+.next-btn {
+  right: 0;
+}
+
+/* On mobile, revert to scroll only and hide arrows */
+@media (max-width: 1024px) {
+  .carousel-btn {
+    display: none;
+  }
+
+  .analyzed-hotel-card {
+    min-width: 280px;
+    flex: 0 0 auto;
+  }
 }
 
 .analyzed-hotel-card:hover {
