@@ -1865,3 +1865,77 @@ img {
     gap: 30px;
   }
 }
+
+/* ===== DASHBOARD PREVIEW SECTION ===== */
+.dashboard-preview-section {
+  padding: var(--spacing-xl) 0;
+  background: #f8fafc;
+  border-top: 1px solid var(--color-border);
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.dashboard-screenshot-placeholder {
+  width: 100%;
+  aspect-ratio: 16/10;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  /* Nice floaty shadow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0aec0;
+  font-weight: 600;
+  font-family: var(--font-display);
+}
+
+.dashboard-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-features li {
+  margin-bottom: 32px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.dashboard-features li:last-child {
+  margin-bottom: 0;
+}
+
+.dashboard-features li h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.dashboard-features li p {
+  font-size: 16px;
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .dashboard-visual {
+    order: 2;
+    /* Content first on mobile? Or verify preference. Standard is usually visual first or second. Let's keep order natural. */
+    order: 1;
+  }
+}
