@@ -946,6 +946,47 @@ img {
   background: var(--color-white);
 }
 
+.methodology-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.method-item {
+  text-align: center;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.method-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.method-item h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.method-item p {
+  font-size: 15px;
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .methodology-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
 .action-section {
   padding: var(--spacing-xl) 0;
   background: var(--color-background);

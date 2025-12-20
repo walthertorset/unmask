@@ -26,7 +26,7 @@
     rel="stylesheet">
 
   <!-- Your CSS -->
-  <link rel="stylesheet" href="styles.css?v=1.6">
+  <link rel="stylesheet" href="styles.css?v=1.7">
 </head>
 
 <body>
@@ -319,10 +319,23 @@
   <section class="calculation-section">
     <div class="container">
       <h2 class="section-title" style="text-align: center;">How We Calculate Scores</h2>
-      <p class="section-description">
-        Unmask analyzes review patterns, recency, and user credibility to filter out irrelevant or suspicious feedback.
-        We weigh verified issues heavier than generic praise to give you a realistic expectation of your stay.
-      </p>
+      <div class="methodology-grid">
+        <div class="method-item">
+          <div class="method-icon">🎯</div>
+          <h3>Recency Weighting</h3>
+          <p>Recent reviews count more—last 3 months weighted heaviest to catch declining quality</p>
+        </div>
+        <div class="method-item">
+          <div class="method-icon">⚠️</div>
+          <h3>Severity Hierarchy</h3>
+          <p>Critical issues (bed bugs, hygiene, safety) drop scores significantly, not averaged away</p>
+        </div>
+        <div class="method-item">
+          <div class="method-icon">🤖</div>
+          <h3>Fake Review Detection</h3>
+          <p>Flags suspicious patterns and promotional language that inflate ratings</p>
+        </div>
+      </div>
     </div>
   </section>
 
