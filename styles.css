@@ -874,8 +874,55 @@ img {
   /* Hide standard dividers to save space */
 }
 
-.compare-placeholder {
+/* ===== CALCULATION & ACTION SECTIONS ===== */
+.calculation-section {
+  padding: var(--spacing-xl) 0;
+  background: var(--color-white);
+}
+
+.action-section {
+  padding: var(--spacing-xl) 0;
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.action-card {
   text-align: center;
+}
+
+.screenshot-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: #718096;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.action-card h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .action-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
 }
 
 .compare-placeholder h3 {
