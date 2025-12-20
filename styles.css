@@ -501,7 +501,7 @@ img {
 .hero-cta {
   text-align: center;
   padding: var(--spacing-lg) 0;
-  margin-top: -80px;
+  margin-top: -100px;
   position: relative;
   z-index: 10;
 }
