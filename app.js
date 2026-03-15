@@ -220,8 +220,6 @@ function initCarousel() {
 
 // ===== INITIALIZE ALL FUNCTIONALITY ON PAGE LOAD =====
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('Page loaded, initializing...');
-
   // Initialize header animations
   initHeaderAnimations();
 
@@ -233,7 +231,40 @@ document.addEventListener('DOMContentLoaded', function () {
     initExtensionIntegration();
     setupMessageListener();
   }
+
+  // Handle Stripe checkout return
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('credits') === 'added') {
+    showCreditsToast('Payment successful! Your analyses have been added. Open Unmask on any hotel page to see your updated balance.', 'success');
+    // Remove the query param from the URL without reloading
+    const cleanUrl = window.location.pathname;
+    history.replaceState(null, '', cleanUrl);
+  } else if (params.get('credits') === 'cancelled') {
+    showCreditsToast('Payment cancelled. No charges were made.', 'info');
+    const cleanUrl = window.location.pathname;
+    history.replaceState(null, '', cleanUrl);
+  }
 });
+
+function showCreditsToast(message, type) {
+  const toast = document.createElement('div');
+  const bg = type === 'success' ? '#2d6a4f' : '#555';
+  const icon = type === 'success' ? '✓' : 'ℹ';
+  toast.style.cssText = `
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: ${bg}; color: #fff; padding: 14px 24px; border-radius: 8px;
+    font-family: Inter, sans-serif; font-size: 15px; z-index: 9999;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2); max-width: 480px; text-align: center;
+    display: flex; align-items: center; gap: 10px;
+  `;
+  toast.innerHTML = `<span style="font-size:18px;font-weight:bold">${icon}</span><span>${message}</span>`;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.5s';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 500);
+  }, 6000);
+}
 
 // Listen for messages from the extension
 function setupMessageListener() {
@@ -242,7 +273,6 @@ function setupMessageListener() {
     if (event.origin !== window.location.origin) return;
 
     if (event.data.action === 'hotelDataUpdated' && event.data.hotels) {
-      console.log('Received hotel data update from extension:', event.data.hotels);
       currentHotels = event.data.hotels;
       renderLibrary(currentHotels);
       updateEmptyStates();
@@ -254,7 +284,6 @@ function setupMessageListener() {
   if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'hotelDataUpdated' && message.hotels) {
-        console.log('Received hotel data update from extension via chrome.runtime:', message.hotels);
         currentHotels = message.hotels;
         renderLibrary(currentHotels);
         updateEmptyStates();
@@ -266,33 +295,20 @@ function setupMessageListener() {
 }
 
 function initExtensionIntegration() {
-  console.log('Initializing extension integration...');
-
   const librarySection = document.getElementById('library');
-  if (!librarySection) {
-    console.warn('Library section not found');
-    return;
-  }
+  if (!librarySection) return;
 
   const libraryGrid = librarySection.querySelector('.library-grid');
-  if (!libraryGrid) {
-    console.warn('Library grid not found');
-    return;
-  }
-
-  console.log('Library section and grid found');
+  if (!libraryGrid) return;
 
   // Create connection UI
   createConnectionUI(librarySection);
-  console.log('Connection UI created');
 
   // If we have an ID, try to fetch data
   if (currentExtensionId) {
-    console.log('Extension ID found in storage:', currentExtensionId);
     showMessage('Connecting to extension...', '#009A8E');
     fetchDataFromExtension(currentExtensionId);
   } else {
-    console.log('No extension ID stored, attempting auto-detection');
     // Show empty state if no extension connected
     renderLibrary([]);
     updateEmptyStates();
@@ -329,34 +345,16 @@ function createConnectionUI(container) {
 
   // We need to insert into the .container div inside it, before the .library-grid
   const containerDiv = container.querySelector('.container');
-  console.log('Found containerDiv:', containerDiv);
-
-  if (!containerDiv) {
-    console.error('Could not find .container div inside library section');
-    return;
-  }
+  if (!containerDiv) return;
 
   const libraryGrid = containerDiv.querySelector('.library-grid');
-  console.log('Found libraryGrid:', libraryGrid);
-  console.log('libraryGrid parent:', libraryGrid ? libraryGrid.parentNode : 'N/A');
-  console.log('containerDiv:', containerDiv);
-  console.log('Are they the same?', libraryGrid && libraryGrid.parentNode === containerDiv);
-
-  if (!libraryGrid) {
-    console.error('Could not find .library-grid inside container');
-    return;
-  }
+  if (!libraryGrid) return;
 
   // Now insert the connection UI before the library grid
-  console.log('About to insert connection UI before library grid');
   try {
     containerDiv.insertBefore(controlsDiv, libraryGrid);
-    console.log('Connection UI inserted successfully');
   } catch (error) {
     console.error('Error inserting connection UI:', error);
-    console.error('controlsDiv:', controlsDiv);
-    console.error('libraryGrid:', libraryGrid);
-    console.error('containerDiv:', containerDiv);
   }
 }
 
@@ -369,12 +367,9 @@ function showMessage(msg, color) {
 }
 
 function autoDetectExtension() {
-  console.log('Attempting to auto-detect extension...');
-
   // Method 1: Check if extension injected its ID
   const injectedExtId = document.documentElement.getAttribute('data-unmask-extension-id');
   if (injectedExtId) {
-    console.log('Found extension ID from page injection:', injectedExtId);
     currentExtensionId = injectedExtId;
     localStorage.setItem(STORAGE_KEY_EXT_ID, injectedExtId);
     showMessage('Extension detected! Syncing data...', '#009A8E');
@@ -395,7 +390,6 @@ function autoDetectExtension() {
   const responseHandler = (event) => {
     if (event.data.action === 'unmaskDetectionResponse' && event.data.extensionId) {
       clearTimeout(detectionTimeout);
-      console.log('Extension auto-detected:', event.data.extensionId);
       currentExtensionId = event.data.extensionId;
       localStorage.setItem(STORAGE_KEY_EXT_ID, event.data.extensionId);
       showMessage('Extension connected successfully!', 'green');
@@ -408,22 +402,11 @@ function autoDetectExtension() {
 }
 
 function fetchDataFromExtension(extensionId) {
-  console.log(`[WEBSITE] Attempting to fetch data from extension: ${extensionId}`);
-  console.log('[WEBSITE] Window origin:', window.location.origin);
-
   // Set up a listener for the response
   const responseHandler = function (event) {
-    console.log('[WEBSITE] Received message in responseHandler:', event.data);
-    console.log('[WEBSITE] Message origin:', event.origin);
-    console.log('[WEBSITE] Window origin:', window.location.origin);
-
-    if (event.origin !== window.location.origin) {
-      console.log('[WEBSITE] Ignoring message from different origin');
-      return;
-    }
+    if (event.origin !== window.location.origin) return;
 
     if (event.data && event.data.action === 'getStoredHotelsResponse') {
-      console.log('[WEBSITE] Received hotels response:', event.data);
       window.removeEventListener('message', responseHandler);
 
       // Hide the connection UI box
@@ -463,20 +446,8 @@ function fetchDataFromExtension(extensionId) {
     }
   };
 
-  console.log('[WEBSITE] Adding message listener for response');
-  window.addEventListener('message', responseHandler);
-
-  // Set a timeout in case the extension doesn't respond
-  setTimeout(() => {
-    console.log('[WEBSITE] Timeout reached, removing listener');
-    window.removeEventListener('message', responseHandler);
-  }, 5000);
-
   // Send the request via postMessage to the content script
-  console.log('[WEBSITE] Sending getStoredHotels request via postMessage');
-  console.log('[WEBSITE] Message payload:', { action: 'getStoredHotels' });
   window.postMessage({ action: 'getStoredHotels' }, '*');
-  console.log('[WEBSITE] Message sent');
 }
 
 function getFilteredAndSortedHotels() {
