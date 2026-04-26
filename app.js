@@ -179,6 +179,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Store the extension ID in localStorage for persistence
 const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
+const SUPABASE_PROJECT_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo';
+
+let supabase = null;
+if (window.supabase) {
+  supabase = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+}
+
 let currentExtensionId = localStorage.getItem(STORAGE_KEY_EXT_ID) || '';
 let currentHotels = [];
 let currentFilters = {
@@ -230,6 +238,11 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.getElementById('library')) {
     initExtensionIntegration();
     setupMessageListener();
+  }
+
+  // Initialize Auth UI
+  if (supabase) {
+    initAuthUI();
   }
 
   // Handle Stripe checkout return
@@ -294,7 +307,7 @@ function setupMessageListener() {
   }
 }
 
-function initExtensionIntegration() {
+async function initExtensionIntegration() {
   const librarySection = document.getElementById('library');
   if (!librarySection) return;
 
@@ -304,7 +317,31 @@ function initExtensionIntegration() {
   // Create connection UI
   createConnectionUI(librarySection);
 
-  // If we have an ID, try to fetch data
+  // 1. Try to fetch from Supabase if logged in on website
+  if (supabase) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      console.log('User logged in on website, fetching from Supabase...');
+      showMessage('Syncing from cloud...', '#009A8E');
+      try {
+        const hotels = await fetchDataFromSupabase();
+        if (hotels && hotels.length > 0) {
+          currentHotels = hotels;
+          // Hide detection UI if we have cloud data
+          const extensionControls = document.querySelector('.extension-controls');
+          if (extensionControls) extensionControls.style.display = 'none';
+
+          renderLibrary(currentHotels);
+          updateEmptyStates();
+          return; // Skip extension sync if cloud data is active
+        }
+      } catch (err) {
+        console.error('Supabase fetch failed:', err);
+      }
+    }
+  }
+
+  // 2. Fallback to extension sync
   if (currentExtensionId) {
     showMessage('Connecting to extension...', '#009A8E');
     fetchDataFromExtension(currentExtensionId);
@@ -314,6 +351,122 @@ function initExtensionIntegration() {
     updateEmptyStates();
     // Try to auto-detect extension ID by attempting connection
     autoDetectExtension();
+  }
+}
+
+async function fetchDataFromSupabase() {
+  if (!supabase) return null;
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    // Join user_analyses -> hotel_analyses
+    const { data: rows, error } = await supabase
+      .from('user_analyses')
+      .select('created_at, hotel_analyses(*)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Deduplicate and format (same as background.js)
+    const seen = new Set();
+    return rows
+      .filter(row => {
+        const hotelId = row.hotel_analyses?.hotel_id;
+        if (!hotelId || seen.has(hotelId)) return false;
+        seen.add(hotelId);
+        return true;
+      })
+      .map(row => {
+        const ha = row.hotel_analyses;
+        return {
+          hotelId: ha.hotel_id,
+          hotelName: ha.hotel_name,
+          location: ha.location || 'Unknown',
+          url: ha.booking_url || '#',
+          site: ha.site || 'Unknown',
+          analysis: ha.analysis_data,
+          originalRating: ha.original_rating,
+          reviewCount: ha.review_count,
+          priceData: ha.price_data,
+          imageUrl: ha.image_url,
+          analyzedAt: row.created_at
+        };
+      });
+  } catch (error) {
+    console.error('Error fetching from Supabase:', error);
+    return null;
+  }
+}
+
+function initAuthUI() {
+  const desktopNav = document.querySelector('.header-display-desktop .header-nav-list');
+  const mobileNav = document.querySelector('.mobile-nav');
+
+  // Add for desktop
+  if (desktopNav) {
+    const desktopItem = document.createElement('div');
+    desktopItem.id = 'header-account-desktop';
+    desktopItem.className = 'header-nav-item';
+    desktopItem.style.marginLeft = '20px';
+    desktopNav.appendChild(desktopItem);
+  }
+
+  // Update on auth change
+  supabase.auth.onAuthStateChange((event, session) => {
+    updateAccountUI(session?.user);
+
+    // Refresh dashboard if signed in
+    if (event === 'SIGNED_IN' && document.getElementById('library')) {
+      initExtensionIntegration();
+    }
+  });
+
+  // Check initial state
+  supabase.auth.getUser().then(({ data: { user } }) => {
+    updateAccountUI(user);
+  });
+}
+
+function updateAccountUI(user) {
+  const deskEl = document.getElementById('header-account-desktop');
+
+  if (!deskEl) return;
+
+  if (user) {
+    const avatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+    const name = user.user_metadata?.full_name || user.email.split('@')[0];
+
+    deskEl.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #f0fdfa; padding: 4px 12px; border-radius: 20px; border: 1px solid #ccfbf1;" id="auth-user-btn">
+        ${avatar ? `<img src="${avatar}" style="width: 24px; height: 24px; border-radius: 50%;">` : '👤'}
+        <span style="font-size: 13px; font-weight: 600; color: #009A8E;">${name.split(' ')[0]}</span>
+      </div>
+    `;
+
+    deskEl.querySelector('#auth-user-btn').onclick = () => {
+      if (confirm('Sign out from Unmask?')) {
+        supabase.auth.signOut();
+        location.reload(); // Hard reload to clear states
+      }
+    };
+  } else {
+    deskEl.innerHTML = `
+      <a href="#" id="auth-signin-btn" style="background: #009A8E; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 14px; transition: opacity 0.2s;">
+        Sign In
+      </a>
+    `;
+
+    deskEl.querySelector('#auth-signin-btn').onclick = (e) => {
+      e.preventDefault();
+      supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname
+        }
+      });
+    };
   }
 }
 
