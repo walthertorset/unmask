@@ -39,6 +39,7 @@ let lastScrollTop = 0;
 const scrollThreshold = 100; // Start hiding after scrolling 100px
 
 window.addEventListener('scroll', function () {
+  if (!header) return;
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
   // Don't apply hide/show until past threshold
@@ -192,7 +193,7 @@ let currentHotels = [];
 let currentFilters = {
   search: '',
   destination: 'all',
-
+  priceRange: 'all',
   sortBy: 'date-newest'
 };
 
@@ -432,7 +433,10 @@ function initAuthUI() {
 function updateAccountUI(user) {
   const deskEl = document.getElementById('header-account-desktop');
 
-  if (!deskEl) return;
+  if (!deskEl) {
+    console.log('Account element not found, skipping UI update');
+    return;
+  }
 
   if (user) {
     const avatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
