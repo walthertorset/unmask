@@ -382,6 +382,9 @@ async function initExtensionIntegration() {
         syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
 
         const hotels = await fetchDataFromSupabase(sbClient);
+        const libraryDesc = document.getElementById('library-description');
+        if (libraryDesc) libraryDesc.style.display = 'block'; // Show description when logged in
+
         if (hotels && hotels.length > 0) {
           currentHotels = hotels;
           renderLibrary(currentHotels);
@@ -391,7 +394,7 @@ async function initExtensionIntegration() {
           return;
         } else {
           syncStatus.innerHTML = '';
-          renderLibrary([]);
+          renderLibrary([]); // This will show the "No Hotels Analyzed Yet" box
           updateEmptyStates();
           return;
         }
@@ -403,9 +406,12 @@ async function initExtensionIntegration() {
   }
 
   // 2. Not logged in — show the connection UI as a prompt to sign in
+  const libraryDesc = document.getElementById('library-description');
+  if (libraryDesc) libraryDesc.style.display = 'none'; // Hide redundant description
+  
   createConnectionUI(librarySection);
-  renderLibrary([]);
-  updateEmptyStates();
+  // Don't call renderLibrary([]) here, we don't want the dashed "No Hotels Analyzed Yet" box
+  // if we are already showing the "Syncing your library" card.
 }
 
 async function fetchDataFromSupabase(sbClient) {
@@ -673,13 +679,27 @@ function createConnectionUI(container) {
 
   controlsDiv.innerHTML = `
     <div style="max-width: 600px; margin: 0 auto;">
-      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748;">Syncing your library</h3>
-      <p style="margin-bottom: 15px; font-size: 14px; color: #4a5568; line-height: 1.6;">
-        Sign in to load your analyzed hotels from the cloud. Hotels you analyze with the Unmask extension are automatically saved to your account.
+      <h3 style="margin-bottom: 10px; font-size: 20px; color: #2d3748;">Sync your library</h3>
+      <p style="margin-bottom: 20px; font-size: 15px; color: #4a5568; line-height: 1.6;">
+        Sign in to load your analyzed hotels from the cloud. Your history will automatically sync across all your devices.
       </p>
-      <div id="connection-status" style="margin-top: 12px; font-size: 14px; min-height: 24px; font-weight: 500;"></div>
+      <button id="inline-signin-btn" style="padding: 12px 32px; background: #009A8E; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+        Sign In to Unmask
+      </button>
+      <div id="connection-status" style="margin-top: 16px; font-size: 14px; min-height: 24px; font-weight: 500;"></div>
     </div>
   `;
+
+  // Attach sign-in logic to the inline button
+  setTimeout(() => {
+    const btn = document.getElementById('inline-signin-btn');
+    if (btn) {
+      btn.onclick = (e) => {
+        const headerBtn = document.getElementById('auth-signin-btn');
+        if (headerBtn) headerBtn.click();
+      };
+    }
+  }, 0);
 
   // Insert before the grid
   // The container parameter is the library section (#library)
