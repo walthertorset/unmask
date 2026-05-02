@@ -1,34 +1,45 @@
 // ===== DYNAMIC HEADER ANIMATIONS =====
 
+console.log('APP.JS LOADED');
+
 function initHeaderAnimations() {
+  console.log('initHeaderAnimations: Starting initialization');
   // Add flexIn class to all animated elements after a short delay
   setTimeout(() => {
     // Animate header title
-    const headerTitle = document.querySelector('.header-title');
-    if (headerTitle) {
-      headerTitle.classList.add('flexIn');
-    }
+    const headerTitles = document.querySelectorAll('.header-title');
+    console.log(`initHeaderAnimations: Found ${headerTitles.length} header titles`);
+    headerTitles.forEach(title => {
+      title.classList.add('flexIn');
+    });
 
     // Animate all nav items
     const navItems = document.querySelectorAll('.header-nav-item');
+    console.log(`initHeaderAnimations: Found ${navItems.length} nav items`);
     navItems.forEach((item) => {
       item.classList.add('flexIn');
     });
 
     // Initialize Secret Listener
-    setupSecretListener();
+    if (typeof setupSecretListener === 'function') {
+      setupSecretListener();
+    } else {
+      console.warn('initHeaderAnimations: setupSecretListener not found');
+    }
 
     // Animate CTA button
-    const ctaAction = document.querySelector('.header-actions-action');
-    if (ctaAction) {
-      ctaAction.classList.add('flexIn');
-    }
+    const ctaActions = document.querySelectorAll('.header-actions-action');
+    ctaActions.forEach(cta => {
+      cta.classList.add('flexIn');
+    });
 
     // Animate burger menu
-    const burger = document.querySelector('.header-burger');
-    if (burger) {
+    const burgers = document.querySelectorAll('.header-burger');
+    burgers.forEach(burger => {
       burger.classList.add('flexIn');
-    }
+    });
+    
+    console.log('initHeaderAnimations: Animation classes applied');
   }, 100);
 }
 
@@ -67,34 +78,37 @@ window.addEventListener('scroll', function () {
 
 // ===== MOBILE MENU TOGGLE =====
 
-const burgerBtn = document.querySelector('.header-burger-btn');
-const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
-const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
+function initMobileMenu() {
+  const burgerBtn = document.querySelector('.header-burger-btn');
+  const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
 
-if (burgerBtn && mobileMenuOverlay) {
-  burgerBtn.addEventListener('click', function () {
-    burgerBtn.classList.toggle('active');
-    mobileMenuOverlay.classList.toggle('active');
-    document.body.style.overflow = mobileMenuOverlay.classList.contains('active') ? 'hidden' : '';
-  });
-
-  // Close menu when clicking on a link
-  mobileNavLinks.forEach(link => {
-    link.addEventListener('click', function () {
-      burgerBtn.classList.remove('active');
-      mobileMenuOverlay.classList.remove('active');
-      document.body.style.overflow = '';
+  if (burgerBtn && mobileMenuOverlay) {
+    burgerBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      burgerBtn.classList.toggle('active');
+      mobileMenuOverlay.classList.toggle('active');
+      document.body.style.overflow = mobileMenuOverlay.classList.contains('active') ? 'hidden' : '';
     });
-  });
 
-  // Close menu when clicking outside
-  mobileMenuOverlay.addEventListener('click', function (e) {
-    if (e.target === mobileMenuOverlay) {
-      burgerBtn.classList.remove('active');
-      mobileMenuOverlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-  });
+    // Close menu when clicking on a link
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', function () {
+        burgerBtn.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Close menu when clicking outside
+    mobileMenuOverlay.addEventListener('click', function (e) {
+      if (e.target === mobileMenuOverlay) {
+        burgerBtn.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  }
 }
 
 // ===== FORM SUBMISSION =====
@@ -154,7 +168,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       const target = document.querySelector(cleanHref);
       if (target) {
         e.preventDefault();
-        const headerHeight = header.offsetHeight;
+        const headerHeight = header ? header.offsetHeight : 0;
         const targetPosition = target.offsetTop - headerHeight - 20;
 
         window.scrollTo({
@@ -163,6 +177,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         });
 
         // Close mobile menu if open
+        const burgerBtn = document.querySelector('.header-burger-btn');
+        const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
         if (burgerBtn && mobileMenuOverlay) {
           burgerBtn.classList.remove('active');
           mobileMenuOverlay.classList.remove('active');
@@ -228,9 +244,13 @@ function initCarousel() {
 }
 
 // ===== INITIALIZE ALL FUNCTIONALITY ON PAGE LOAD =====
-document.addEventListener('DOMContentLoaded', function () {
+function initAll() {
+  console.log('initAll executing');
   // Initialize header animations
   initHeaderAnimations();
+  
+  // Initialize mobile menu
+  initMobileMenu();
 
   // Initialize carousel
   initCarousel();
@@ -258,7 +278,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const cleanUrl = window.location.pathname;
     history.replaceState(null, '', cleanUrl);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAll);
+} else {
+  initAll();
+}
 
 function showCreditsToast(message, type) {
   const toast = document.createElement('div');
@@ -409,7 +435,7 @@ function initAuthUI() {
   if (desktopNav) {
     const desktopItem = document.createElement('div');
     desktopItem.id = 'header-account-desktop';
-    desktopItem.className = 'header-nav-item';
+    desktopItem.className = 'header-nav-item flexIn';
     desktopItem.style.marginLeft = '20px';
     desktopNav.appendChild(desktopItem);
   }
