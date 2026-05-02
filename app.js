@@ -294,7 +294,7 @@ function initAll() {
 
   // Update version tag
   const versionTag = document.querySelector('.footer-column p[style*="font-size: 10px"]');
-  if (versionTag) versionTag.textContent = 'Build v1.1.1-auth-force';
+  if (versionTag) versionTag.textContent = 'Build v1.1.2-final-force';
 }
 
 if (document.readyState === 'loading') {
