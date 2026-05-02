@@ -294,7 +294,7 @@ function initAll() {
 
   // Update version tag
   const versionTag = document.querySelector('.footer-column p[style*="font-size: 10px"]');
-  if (versionTag) versionTag.textContent = 'Build v1.1.4-ultimate-fix';
+  if (versionTag) versionTag.textContent = 'Build v1.1.5-delegation';
 }
 
 if (document.readyState === 'loading') {
@@ -460,43 +460,55 @@ async function fetchDataFromSupabase() {
 }
 
 function initAuthUI() {
-  console.log('initAuthUI: Starting...');
+  console.log('initAuthUI: Initializing event delegation...');
+  
+  // GLOBAL EVENT DELEGATION for Auth buttons
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('#auth-signin-btn');
+    if (target) {
+      console.log('initAuthUI: Sign In button CLICKED!');
+      e.preventDefault();
+      if (!unmaskSupabase) {
+        console.error('initAuthUI: Supabase NOT initialized yet!');
+        alert('Initializing authentication... please try again in a second.');
+        initSupabase();
+        return;
+      }
+      unmaskSupabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname
+        }
+      });
+    }
+  });
+
   const accountArea = document.getElementById('header-account-area');
   if (!accountArea) {
     console.error('initAuthUI: #header-account-area NOT FOUND in DOM');
     return;
   }
 
-  // Force an initial state so it's not empty while waiting for Supabase
-  console.log('initAuthUI: Forcing initial Sign In button');
+  // Force an initial state
   updateAccountUI(null);
 
   // Update on auth change
-  unmaskSupabase.auth.onAuthStateChange((event, session) => {
-    console.log(`Auth state change event: ${event}`);
-    updateAccountUI(session?.user);
+  if (unmaskSupabase) {
+    unmaskSupabase.auth.onAuthStateChange((event, session) => {
+      console.log(`Auth state change event: ${event}`);
+      updateAccountUI(session?.user);
 
-    // Refresh dashboard if signed in
-    if (event === 'SIGNED_IN' && document.getElementById('library')) {
-      initExtensionIntegration();
-    }
-  });
+      if (event === 'SIGNED_IN' && document.getElementById('library')) {
+        initExtensionIntegration();
+      }
+    });
 
-  // Check initial state with timeout
-  console.log('initAuthUI: Checking getUser()...');
-  const authTimeout = setTimeout(() => {
-    console.warn('initAuthUI: getUser() timed out after 3s');
-  }, 3000);
-
-  unmaskSupabase.auth.getUser().then(({ data: { user } }) => {
-    clearTimeout(authTimeout);
-    console.log('initAuthUI: getUser() returned:', user ? 'User found' : 'No user');
-    updateAccountUI(user);
-  }).catch(err => {
-    clearTimeout(authTimeout);
-    console.error('initAuthUI: getUser() FAILED:', err);
-    updateAccountUI(null);
-  });
+    // Check initial state
+    unmaskSupabase.auth.getUser().then(({ data: { user } }) => {
+      console.log('initAuthUI: Initial getUser returned:', user ? 'User' : 'None');
+      updateAccountUI(user);
+    });
+  }
 }
 
 function updateAccountUI(user) {
@@ -582,19 +594,6 @@ function updateAccountUI(user) {
     accountArea.innerHTML = `
       <a href="#" class="signin-btn" id="auth-signin-btn">Sign In</a>
     `;
-
-    const signinBtn = document.getElementById('auth-signin-btn');
-    if (signinBtn) {
-      signinBtn.onclick = (e) => {
-        e.preventDefault();
-        unmaskSupabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: window.location.origin + window.location.pathname
-          }
-        });
-      };
-    }
   }
 }
 
