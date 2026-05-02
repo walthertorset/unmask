@@ -686,9 +686,9 @@ function createConnectionUI(container) {
 
   controlsDiv.innerHTML = `
     <div style="max-width: 600px; margin: 0 auto;">
-      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748;">Extension Connection</h3>
+      <h3 style="margin-bottom: 10px; font-size: 18px; color: #2d3748;">Syncing your library</h3>
       <p style="margin-bottom: 15px; font-size: 14px; color: #4a5568; line-height: 1.6;">
-        Connecting to Unmask extension...
+        Sign in to load your analyzed hotels from the cloud. Hotels you analyze with the Unmask extension are automatically saved to your account.
       </p>
       <div id="connection-status" style="margin-top: 12px; font-size: 14px; min-height: 24px; font-weight: 500;"></div>
     </div>
