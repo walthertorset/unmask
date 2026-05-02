@@ -284,7 +284,6 @@ function initAll() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('credits') === 'added') {
     showCreditsToast('Payment successful! Your analyses have been added. Open Unmask on any hotel page to see your updated balance.', 'success');
-    // Remove the query param from the URL without reloading
     const cleanUrl = window.location.pathname;
     history.replaceState(null, '', cleanUrl);
   } else if (params.get('credits') === 'cancelled') {
@@ -292,6 +291,10 @@ function initAll() {
     const cleanUrl = window.location.pathname;
     history.replaceState(null, '', cleanUrl);
   }
+
+  // Update version tag
+  const versionTag = document.querySelector('.footer-column p[style*="font-size: 10px"]');
+  if (versionTag) versionTag.textContent = 'Build v1.1.1-auth-force';
 }
 
 if (document.readyState === 'loading') {
@@ -457,11 +460,20 @@ async function fetchDataFromSupabase() {
 }
 
 function initAuthUI() {
+  console.log('initAuthUI: Starting...');
   const accountArea = document.getElementById('header-account-area');
+  if (!accountArea) {
+    console.error('initAuthUI: #header-account-area NOT FOUND in DOM');
+    return;
+  }
+
+  // Force an initial state so it's not empty while waiting for Supabase
+  console.log('initAuthUI: Forcing initial Sign In button');
+  updateAccountUI(null);
 
   // Update on auth change
   supabase.auth.onAuthStateChange((event, session) => {
-    console.log(`Auth state change: ${event}`);
+    console.log(`Auth state change event: ${event}`);
     updateAccountUI(session?.user);
 
     // Refresh dashboard if signed in
@@ -470,9 +482,20 @@ function initAuthUI() {
     }
   });
 
-  // Check initial state
+  // Check initial state with timeout
+  console.log('initAuthUI: Checking getUser()...');
+  const authTimeout = setTimeout(() => {
+    console.warn('initAuthUI: getUser() timed out after 3s');
+  }, 3000);
+
   supabase.auth.getUser().then(({ data: { user } }) => {
+    clearTimeout(authTimeout);
+    console.log('initAuthUI: getUser() returned:', user ? 'User found' : 'No user');
     updateAccountUI(user);
+  }).catch(err => {
+    clearTimeout(authTimeout);
+    console.error('initAuthUI: getUser() FAILED:', err);
+    updateAccountUI(null);
   });
 }
 
