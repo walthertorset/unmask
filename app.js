@@ -370,34 +370,44 @@ async function initExtensionIntegration() {
     libraryGrid.parentNode.insertBefore(syncStatus, libraryGrid);
   }
 
-  // 1. Try to fetch from Supabase if logged in on website
-  if (unmaskSupabase) {
-    const { data: { session } } = await unmaskSupabase.auth.getSession();
-    if (session) {
-      console.log('User logged in on website, fetching from Supabase...');
-      syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
-      
-      try {
-        const hotels = await fetchDataFromSupabase();
+  // 1. Try to fetch from Supabase — create client directly (reliable)
+  const sbClient = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(
+        'https://lbchqbuhzjuovsguiaob.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo'
+      )
+    : null;
+
+  if (sbClient) {
+    try {
+      const { data: { user } } = await sbClient.auth.getUser();
+      if (user) {
+        console.log('User logged in, fetching hotels from Supabase for user:', user.id);
+        syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
+
+        const hotels = await fetchDataFromSupabase(sbClient);
         if (hotels && hotels.length > 0) {
           currentHotels = hotels;
-          // Hide detection UI if we have cloud data
           const extensionControls = document.querySelector('.extension-controls');
           if (extensionControls) extensionControls.style.display = 'none';
-
           renderLibrary(currentHotels);
           updateEmptyStates();
-          syncStatus.innerHTML = '✅ Synced with cloud';
-          setTimeout(() => { if (syncStatus) syncStatus.innerHTML = ''; }, 3000);
-          return; // Skip extension sync if cloud data is active
+          syncStatus.innerHTML = '✅ Synced ' + hotels.length + ' hotels from cloud';
+          setTimeout(() => { if (syncStatus) syncStatus.innerHTML = ''; }, 4000);
+          return;
         } else {
-          syncStatus.innerHTML = '☁️ Cloud library is empty';
+          console.log('No hotels found in Supabase for this user');
+          syncStatus.innerHTML = '☁️ No hotels in cloud yet — try analyzing some!';
         }
-      } catch (err) {
-        console.error('Supabase fetch failed:', err);
-        syncStatus.innerHTML = '❌ Cloud sync failed';
+      } else {
+        console.log('Not logged in, skipping Supabase fetch');
       }
+    } catch (err) {
+      console.error('Supabase fetch failed:', err);
+      syncStatus.innerHTML = '❌ Cloud sync failed: ' + err.message;
     }
+  } else {
+    console.warn('Supabase SDK not available for dashboard fetch');
   }
 
   // 2. Fallback to extension sync
@@ -405,30 +415,34 @@ async function initExtensionIntegration() {
     syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Connecting to extension...</span>';
     fetchDataFromExtension(currentExtensionId);
   } else {
-    // Show empty state if no extension connected
     renderLibrary([]);
     updateEmptyStates();
-    // Try to auto-detect extension ID by attempting connection
     autoDetectExtension();
   }
 }
 
-async function fetchDataFromSupabase() {
-  if (!unmaskSupabase) return null;
+async function fetchDataFromSupabase(sbClient) {
+  if (!sbClient) return null;
 
   try {
-    const { data: { user } } = await unmaskSupabase.auth.getUser();
+    const { data: { user } } = await sbClient.auth.getUser();
     if (!user) return null;
 
+    console.log('Fetching hotels for user_id:', user.id);
+
     // Join user_analyses -> hotel_analyses
-    const { data: rows, error } = await supabase
+    const { data: rows, error } = await sbClient
       .from('user_analyses')
       .select('created_at, hotel_analyses(*)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    // Deduplicate and format (same as background.js)
+    console.log('Raw rows from Supabase:', rows ? rows.length : 0);
+
+    if (!rows || rows.length === 0) return [];
+
+    // Deduplicate and format
     const seen = new Set();
     return rows
       .filter(row => {
