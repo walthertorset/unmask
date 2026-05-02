@@ -196,14 +196,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Store the extension ID in localStorage for persistence
 const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
-const SUPABASE_PROJECT_URL = 'https://lbchqbuhzjuovsguiaob.unmaskSupabase.co';
+const SUPABASE_PROJECT_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo';
 
-let unmaskunmaskSupabase = null;
+let unmaskSupabase = null;
 function initSupabase() {
   if (window.supabase && !supabase) {
     console.log('Supabase library detected, initializing client...');
-    unmaskSupabase = window.unmaskSupabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+    unmaskSupabase = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
     return true;
   }
   return !!unmaskSupabase;
@@ -374,7 +374,7 @@ async function initExtensionIntegration() {
   if (unmaskSupabase) {
     const { data: { session } } = await unmaskSupabase.auth.getSession();
     if (session) {
-      console.log('User logged in on website, fetching from unmaskSupabase...');
+      console.log('User logged in on website, fetching from Supabase...');
       syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
       
       try {
