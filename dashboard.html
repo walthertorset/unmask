@@ -204,6 +204,16 @@
     </div>
   </footer>
   <!-- Auth: Self-contained sign-in logic -->
+  <style>
+    #auth-signin-btn:hover {
+      background: rgba(0, 154, 142, 0.05);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 154, 142, 0.1);
+    }
+    #auth-signin-btn:active {
+      transform: translateY(0);
+    }
+  </style>
   <script>
     (function() {
       var SUPA_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
@@ -332,7 +342,7 @@
         if (!area) return;
         var client = getClient();
         if (!client) {
-          area.innerHTML = '<a href="#" id="auth-signin-btn" style="font-size:14px;font-weight:500;color:#3a3a3a;text-decoration:none;padding:4px 0;transition:color 0.2s;">Sign In</a>';
+          area.innerHTML = '<a href="#" id="auth-signin-btn" style="font-size:13px;font-weight:600;color:#009A8E;text-decoration:none;padding:8px 20px;border:1.5px solid #009A8E;border-radius:100px;transition:all 0.2s;line-height:1;display:inline-block;">Sign In</a>';
           area.querySelector('#auth-signin-btn').onclick = handleSignIn;
           return;
         }
@@ -393,7 +403,7 @@
             if (signoutBtn) signoutBtn.onclick = handleSignOut;
 
           } else {
-            area.innerHTML = '<a href="#" id="auth-signin-btn" style="font-size:14px;font-weight:500;color:#3a3a3a;text-decoration:none;padding:4px 0;transition:color 0.2s;">Sign In</a>';
+            area.innerHTML = '<a href="#" id="auth-signin-btn" style="font-size:13px;font-weight:600;color:#009A8E;text-decoration:none;padding:8px 20px;border:1.5px solid #009A8E;border-radius:100px;transition:all 0.2s;line-height:1;display:inline-block;">Sign In</a>';
             area.querySelector('#auth-signin-btn').onclick = handleSignIn;
           }
         });
@@ -412,6 +422,7 @@
 </body>
 
 </html>
+
 
 
 
