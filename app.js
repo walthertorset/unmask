@@ -358,10 +358,7 @@ async function initExtensionIntegration() {
   const libraryGrid = librarySection.querySelector('.library-grid');
   if (!libraryGrid) return;
 
-  // Create connection UI
-  createConnectionUI(librarySection);
-
-  // Add sync status indicator
+  // Add sync status indicator (small, below the grid header)
   let syncStatus = document.getElementById('sync-status-indicator');
   if (!syncStatus) {
     syncStatus = document.createElement('div');
@@ -382,43 +379,33 @@ async function initExtensionIntegration() {
     try {
       const { data: { user } } = await sbClient.auth.getUser();
       if (user) {
-        console.log('User logged in, fetching hotels from Supabase for user:', user.id);
         syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
 
         const hotels = await fetchDataFromSupabase(sbClient);
         if (hotels && hotels.length > 0) {
           currentHotels = hotels;
-          const extensionControls = document.querySelector('.extension-controls');
-          if (extensionControls) extensionControls.style.display = 'none';
           renderLibrary(currentHotels);
           updateEmptyStates();
-          syncStatus.innerHTML = '✅ Synced ' + hotels.length + ' hotels from cloud';
-          setTimeout(() => { if (syncStatus) syncStatus.innerHTML = ''; }, 4000);
+          syncStatus.innerHTML = '✅ Synced ' + hotels.length + ' hotels';
+          setTimeout(() => { if (syncStatus) syncStatus.innerHTML = ''; }, 3000);
           return;
         } else {
-          console.log('No hotels found in Supabase for this user');
-          syncStatus.innerHTML = '☁️ No hotels in cloud yet — try analyzing some!';
+          syncStatus.innerHTML = '';
+          renderLibrary([]);
+          updateEmptyStates();
+          return;
         }
-      } else {
-        console.log('Not logged in, skipping Supabase fetch');
       }
     } catch (err) {
       console.error('Supabase fetch failed:', err);
-      syncStatus.innerHTML = '❌ Cloud sync failed: ' + err.message;
+      syncStatus.innerHTML = '';
     }
-  } else {
-    console.warn('Supabase SDK not available for dashboard fetch');
   }
 
-  // 2. Fallback to extension sync
-  if (currentExtensionId) {
-    syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Connecting to extension...</span>';
-    fetchDataFromExtension(currentExtensionId);
-  } else {
-    renderLibrary([]);
-    updateEmptyStates();
-    autoDetectExtension();
-  }
+  // 2. Not logged in — show the connection UI as a prompt to sign in
+  createConnectionUI(librarySection);
+  renderLibrary([]);
+  updateEmptyStates();
 }
 
 async function fetchDataFromSupabase(sbClient) {
