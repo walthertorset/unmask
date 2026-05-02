@@ -1956,7 +1956,6 @@ img {
   margin-left: 20px;
   display: flex;
   align-items: center;
-  outline: 2px dashed rgba(0, 154, 142, 0.4); /* DEBUG BORDER */
 }
 
 .profile-badge {

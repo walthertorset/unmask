@@ -418,28 +418,25 @@
       </div>
     </div>
   </footer>
-
   <!-- Auth: Self-contained sign-in logic -->
   <script>
     (function() {
       var SUPA_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
       var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo';
-      
+      var _client = null;
+
       function getClient() {
-        if (window.supabase && window.supabase.createClient) {
-          return window.supabase.createClient(SUPA_URL, SUPA_KEY);
+        if (!_client && window.supabase && window.supabase.createClient) {
+          _client = window.supabase.createClient(SUPA_URL, SUPA_KEY);
         }
-        return null;
+        return _client;
       }
 
       function handleSignIn(e) {
         e.preventDefault();
         var client = getClient();
         if (!client) { alert('Auth not ready, please refresh.'); return; }
-        client.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: window.location.href }
-        });
+        client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
       }
 
       function handleSignOut(e) {
@@ -451,32 +448,69 @@
         }
       }
 
+      function showProfileModal(user) {
+        var existing = document.getElementById('unmask-profile-modal');
+        if (existing) existing.remove();
+        var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+        var email = user.email;
+        var avatar = (user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || '';
+        var avatarHtml = avatar
+          ? '<img src="' + avatar + '" style="width:72px;height:72px;border-radius:50%;border:3px solid #e2e8f0;">'
+          : '<div style="width:72px;height:72px;border-radius:50%;background:#009A8E;color:white;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;">' + name.charAt(0).toUpperCase() + '</div>';
+        var modal = document.createElement('div');
+        modal.id = 'unmask-profile-modal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);';
+        modal.innerHTML = '<div style="background:white;width:100%;max-width:420px;border-radius:16px;padding:36px;box-shadow:0 24px 60px rgba(0,0,0,0.18);position:relative;font-family:Inter,sans-serif;">'
+          + '<button id="modal-x" style="position:absolute;top:16px;right:16px;background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:#64748b;display:flex;align-items:center;justify-content:center;">&#x2715;</button>'
+          + '<h2 style="font-family:Fraunces,serif;font-size:22px;margin:0 0 24px;color:#1e293b;">Your Profile</h2>'
+          + '<div style="display:flex;align-items:center;gap:20px;padding:20px;background:#f8fafc;border-radius:12px;margin-bottom:28px;">'
+          + avatarHtml
+          + '<div><div style="font-size:18px;font-weight:700;color:#1e293b;">' + name + '</div><div style="font-size:14px;color:#64748b;margin-top:4px;">' + email + '</div></div>'
+          + '</div>'
+          + '<div style="display:grid;gap:16px;margin-bottom:28px;">'
+          + '<div><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px;">Account Status</div><div style="font-size:15px;font-weight:500;color:#10b981;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:#10b981;border-radius:50%;display:inline-block;"></span>Active</div></div>'
+          + '<div><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px;">Email</div><div style="font-size:15px;font-weight:500;color:#334155;">' + email + '</div></div>'
+          + '</div>'
+          + '<button id="modal-signout" style="width:100%;padding:12px;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Sign Out</button>'
+          + '</div>';
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden';
+        function close() { modal.remove(); document.body.style.overflow = ''; }
+        document.getElementById('modal-x').onclick = close;
+        document.getElementById('modal-signout').onclick = function() { handleSignOut({ stopPropagation: function(){} }); };
+        modal.onclick = function(e) { if (e.target === modal) close(); };
+      }
+
       function renderAuth() {
         var area = document.getElementById('header-account-area');
         if (!area) return;
         var client = getClient();
-        if (!client) { 
-          area.innerHTML = '<a href="#" class="signin-btn" id="auth-signin-btn">Sign In</a>';
+        if (!client) {
+          area.innerHTML = '<a href="#" id="auth-signin-btn" style="font-size:14px;font-weight:500;color:#3a3a3a;text-decoration:none;padding:4px 0;transition:color 0.2s;">Sign In</a>';
           area.querySelector('#auth-signin-btn').onclick = handleSignIn;
-          return; 
+          return;
         }
         client.auth.getUser().then(function(res) {
           var user = res.data && res.data.user;
           if (user) {
             var name = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name.split(' ')[0] : user.email.split('@')[0];
             var avatar = (user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture)) || '';
-            var imgHtml = avatar ? '<img src="' + avatar + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#009A8E;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;">' + name.charAt(0).toUpperCase() + '</div>';
-            area.innerHTML = '<div class="profile-badge" id="profile-badge">' + imgHtml + '<span class="profile-name">' + name + '</span><div class="profile-dropdown" id="profile-dropdown"><div class="dropdown-header"><span style="font-weight:600">' + (user.user_metadata && user.user_metadata.full_name || user.email) + '</span><span class="dropdown-user-email">' + user.email + '</span></div><div class="dropdown-menu"><div class="dropdown-item signout" id="btn-signout">&#x1F6AA; Sign Out</div></div></div></div>';
+            var imgHtml = avatar
+              ? '<img src="' + avatar + '" style="width:28px;height:28px;border-radius:50%;border:2px solid #e2e8f0;">'
+              : '<div style="width:28px;height:28px;border-radius:50%;background:#009A8E;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">' + name.charAt(0).toUpperCase() + '</div>';
+            area.innerHTML = '<div id="profile-badge" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 0;">' + imgHtml + '<span style="font-size:14px;font-weight:500;color:#3a3a3a;">' + name + '</span><div class="profile-dropdown" id="profile-dropdown"><div class="dropdown-header"><span style="font-weight:600;display:block;">' + ((user.user_metadata && user.user_metadata.full_name) || user.email) + '</span><span class="dropdown-user-email">' + user.email + '</span></div><div class="dropdown-menu"><div class="dropdown-item" id="btn-profile">&#x1F464; Profile &amp; Settings</div><div class="dropdown-item signout" id="btn-signout">&#x1F6AA; Sign Out</div></div></div></div>';
             var badge = document.getElementById('profile-badge');
             var dropdown = document.getElementById('profile-dropdown');
             if (badge && dropdown) {
               badge.onclick = function(e) { e.stopPropagation(); dropdown.classList.toggle('active'); };
               document.addEventListener('click', function() { dropdown.classList.remove('active'); });
             }
+            var profileBtn = document.getElementById('btn-profile');
+            if (profileBtn) profileBtn.onclick = function(e) { e.stopPropagation(); dropdown.classList.remove('active'); showProfileModal(user); };
             var signoutBtn = document.getElementById('btn-signout');
             if (signoutBtn) signoutBtn.onclick = handleSignOut;
           } else {
-            area.innerHTML = '<a href="#" class="signin-btn" id="auth-signin-btn">Sign In</a>';
+            area.innerHTML = '<a href="#" id="auth-signin-btn" style="font-size:14px;font-weight:500;color:#3a3a3a;text-decoration:none;padding:4px 0;transition:color 0.2s;">Sign In</a>';
             area.querySelector('#auth-signin-btn').onclick = handleSignIn;
           }
         });
@@ -495,4 +529,5 @@
 </body>
 
 </html>
+
 

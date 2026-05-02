@@ -250,9 +250,51 @@
         </div>
     </footer>
 
+
+  <!-- Auth: Self-contained sign-in logic -->
+  <script>
+<!-- Auth: Self-contained sign-in logic -->
+  <script>
+    (function() {
+      var SUPA_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
+      var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo';
+      var _client = null;
+
+      function getClient() {
+        if (!_client && window.supabase && window.supabase.createClient) {
+          _client = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+        }
+        return _client;
+      }
+
+      function handleSignIn(e) {
+        e.preventDefault();
+        var client = getClient();
+        if (!client) { alert('Auth not ready, please refresh.'); return; }
+        client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+      }
+
+      function handleSignOut(e) {
+        e.stopPropagation();
+        var client = getClient();
+        if (!client) return;
+        if (confirm('Sign out from Unmask?')) {
+          client.auth.signOut().then(function() { location.reload(); });
+        }
+      }
+
+      function showProfileModal(user) {
+        var existing = document.getElementById('unmask-profile-modal');
+        if (existing) existing.remove();
+        var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split(
+  </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="app.js?v=1.1.5"></script>
 </body>
 
 </html>
+
+
+
 
