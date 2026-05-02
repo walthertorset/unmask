@@ -200,9 +200,17 @@ const SUPABASE_PROJECT_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo';
 
 let supabase = null;
-if (window.supabase) {
-  supabase = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+function initSupabase() {
+  if (window.supabase && !supabase) {
+    console.log('Supabase library detected, initializing client...');
+    supabase = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+    return true;
+  }
+  return !!supabase;
 }
+
+// Try to initialize immediately
+initSupabase();
 
 let currentExtensionId = localStorage.getItem(STORAGE_KEY_EXT_ID) || '';
 let currentHotels = [];
@@ -262,8 +270,14 @@ function initAll() {
   }
 
   // Initialize Auth UI
-  if (supabase) {
+  if (initSupabase()) {
+    console.log('initAll: Supabase ready, calling initAuthUI');
     initAuthUI();
+  } else {
+    console.warn('initAll: Supabase not ready, retrying in 500ms...');
+    setTimeout(() => {
+      if (initSupabase()) initAuthUI();
+    }, 500);
   }
 
   // Handle Stripe checkout return
