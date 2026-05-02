@@ -344,12 +344,22 @@ async function initExtensionIntegration() {
   // Create connection UI
   createConnectionUI(librarySection);
 
+  // Add sync status indicator
+  let syncStatus = document.getElementById('sync-status-indicator');
+  if (!syncStatus) {
+    syncStatus = document.createElement('div');
+    syncStatus.id = 'sync-status-indicator';
+    syncStatus.className = 'sync-status';
+    libraryGrid.parentNode.insertBefore(syncStatus, libraryGrid);
+  }
+
   // 1. Try to fetch from Supabase if logged in on website
   if (supabase) {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       console.log('User logged in on website, fetching from Supabase...');
-      showMessage('Syncing from cloud...', '#009A8E');
+      syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
+      
       try {
         const hotels = await fetchDataFromSupabase();
         if (hotels && hotels.length > 0) {
@@ -360,17 +370,22 @@ async function initExtensionIntegration() {
 
           renderLibrary(currentHotels);
           updateEmptyStates();
+          syncStatus.innerHTML = '✅ Synced with cloud';
+          setTimeout(() => { if (syncStatus) syncStatus.innerHTML = ''; }, 3000);
           return; // Skip extension sync if cloud data is active
+        } else {
+          syncStatus.innerHTML = '☁️ Cloud library is empty';
         }
       } catch (err) {
         console.error('Supabase fetch failed:', err);
+        syncStatus.innerHTML = '❌ Cloud sync failed';
       }
     }
   }
 
   // 2. Fallback to extension sync
   if (currentExtensionId) {
-    showMessage('Connecting to extension...', '#009A8E');
+    syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Connecting to extension...</span>';
     fetchDataFromExtension(currentExtensionId);
   } else {
     // Show empty state if no extension connected
@@ -428,20 +443,11 @@ async function fetchDataFromSupabase() {
 }
 
 function initAuthUI() {
-  const desktopNav = document.querySelector('.header-display-desktop .header-nav-list');
-  const mobileNav = document.querySelector('.mobile-nav');
-
-  // Add for desktop
-  if (desktopNav) {
-    const desktopItem = document.createElement('div');
-    desktopItem.id = 'header-account-desktop';
-    desktopItem.className = 'header-nav-item flexIn';
-    desktopItem.style.marginLeft = '20px';
-    desktopNav.appendChild(desktopItem);
-  }
+  const accountArea = document.getElementById('header-account-area');
 
   // Update on auth change
   supabase.auth.onAuthStateChange((event, session) => {
+    console.log(`Auth state change: ${event}`);
     updateAccountUI(session?.user);
 
     // Refresh dashboard if signed in
@@ -457,47 +463,164 @@ function initAuthUI() {
 }
 
 function updateAccountUI(user) {
-  const deskEl = document.getElementById('header-account-desktop');
-
-  if (!deskEl) {
-    console.log('Account element not found, skipping UI update');
-    return;
-  }
+  const accountArea = document.getElementById('header-account-area');
+  if (!accountArea) return;
 
   if (user) {
     const avatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
     const name = user.user_metadata?.full_name || user.email.split('@')[0];
+    const email = user.email;
 
-    deskEl.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #f0fdfa; padding: 4px 12px; border-radius: 20px; border: 1px solid #ccfbf1;" id="auth-user-btn">
-        ${avatar ? `<img src="${avatar}" style="width: 24px; height: 24px; border-radius: 50%;">` : '👤'}
-        <span style="font-size: 13px; font-weight: 600; color: #009A8E;">${name.split(' ')[0]}</span>
+    accountArea.innerHTML = `
+      <div class="profile-badge" id="profile-badge">
+        ${avatar ? `<img src="${avatar}" class="profile-avatar">` : '<div class="profile-avatar" style="background:#009A8E;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">' + name.charAt(0).toUpperCase() + '</div>'}
+        <span class="profile-name">${name.split(' ')[0]}</span>
+        
+        <div class="profile-dropdown" id="profile-dropdown">
+          <div class="dropdown-header">
+            <span style="font-weight:600;display:block;">${name}</span>
+            <span class="dropdown-user-email">${email}</span>
+          </div>
+          <div class="dropdown-menu">
+            <div class="dropdown-item" id="btn-open-profile">👤 Profile Settings</div>
+            <div class="dropdown-item" id="btn-sync-cloud">🔄 Sync with Cloud</div>
+            <div class="dropdown-item signout" id="btn-signout">🚪 Sign Out</div>
+          </div>
+        </div>
       </div>
     `;
 
-    deskEl.querySelector('#auth-user-btn').onclick = () => {
-      if (confirm('Sign out from Unmask?')) {
-        supabase.auth.signOut();
-        location.reload(); // Hard reload to clear states
-      }
-    };
+    // Dropdown toggle
+    const badge = document.getElementById('profile-badge');
+    const dropdown = document.getElementById('profile-dropdown');
+    
+    if (badge && dropdown) {
+      badge.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('active');
+      };
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', () => {
+        dropdown.classList.remove('active');
+      });
+    }
+
+    // Action buttons
+    const signoutBtn = document.getElementById('btn-signout');
+    if (signoutBtn) {
+      signoutBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm('Sign out from Unmask?')) {
+          supabase.auth.signOut().then(() => {
+            location.reload();
+          });
+        }
+      };
+    }
+
+    const profileBtn = document.getElementById('btn-open-profile');
+    if (profileBtn) {
+      profileBtn.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('active');
+        showProfileModal(user);
+      };
+    }
+
+    const syncBtn = document.getElementById('btn-sync-cloud');
+    if (syncBtn) {
+      syncBtn.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('active');
+        if (document.getElementById('library')) {
+          initExtensionIntegration();
+        } else {
+          location.href = 'dashboard.html';
+        }
+      };
+    }
+
   } else {
-    deskEl.innerHTML = `
-      <a href="#" id="auth-signin-btn" style="background: #009A8E; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 14px; transition: opacity 0.2s;">
-        Sign In
-      </a>
+    accountArea.innerHTML = `
+      <a href="#" class="signin-btn" id="auth-signin-btn">Sign In</a>
     `;
 
-    deskEl.querySelector('#auth-signin-btn').onclick = (e) => {
-      e.preventDefault();
-      supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + window.location.pathname
-        }
-      });
-    };
+    const signinBtn = document.getElementById('auth-signin-btn');
+    if (signinBtn) {
+      signinBtn.onclick = (e) => {
+        e.preventDefault();
+        supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname
+          }
+        });
+      };
+    }
   }
+}
+
+function showProfileModal(user) {
+  // Create modal if it doesn't exist
+  let overlay = document.getElementById('profile-modal-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'profile-modal-overlay';
+    overlay.className = 'modal-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const avatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+
+  overlay.innerHTML = `
+    <div class="profile-modal">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <h2 class="modal-title">Your Profile</h2>
+      
+      <div style="display:flex;align-items:center;gap:20px;margin-bottom:30px;padding:20px;background:#f8fafc;border-radius:12px;">
+        ${avatar ? `<img src="${avatar}" style="width:64px;height:64px;border-radius:50%;border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.1);">` : '<div style="width:64px;height:64px;border-radius:50%;background:#009A8E;color:white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;">' + name.charAt(0).toUpperCase() + '</div>'}
+        <div>
+          <h3 style="margin:0;font-size:20px;color:#1e293b;">${name}</h3>
+          <p style="margin:4px 0 0;color:#64748b;font-size:14px;">${user.email}</p>
+        </div>
+      </div>
+
+      <div class="profile-info-grid">
+        <div class="info-item">
+          <label>Account Status</label>
+          <div class="value" style="display:flex;align-items:center;gap:6px;color:#10b981;">
+            <span style="width:8px;height:8px;background:#10b981;border-radius:50%;"></span>
+            Active (Pro)
+          </div>
+        </div>
+        <div class="info-item">
+          <label>Cloud Sync</label>
+          <div class="value">Last synced: Just now</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <button class="cta-button" id="modal-close-confirm" style="width:100%;">Close</button>
+      </div>
+    </div>
+  `;
+
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  const closeBtn = document.getElementById('modal-close-btn');
+  const confirmBtn = document.getElementById('modal-close-confirm');
+
+  const closeModal = () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (confirmBtn) confirmBtn.onclick = closeModal;
+  overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
 }
 
 function createConnectionUI(container) {
