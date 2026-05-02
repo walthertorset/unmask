@@ -536,7 +536,7 @@ function updateAccountUI(user) {
         if (document.getElementById('library')) {
           initExtensionIntegration();
         } else {
-          location.href = 'dashboard.html';
+          location.href = 'dashboard';
         }
       };
     }
