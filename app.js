@@ -196,17 +196,17 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Store the extension ID in localStorage for persistence
 const STORAGE_KEY_EXT_ID = 'unmask_extension_id';
-const SUPABASE_PROJECT_URL = 'https://lbchqbuhzjuovsguiaob.supabase.co';
+const SUPABASE_PROJECT_URL = 'https://lbchqbuhzjuovsguiaob.unmaskSupabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiY2hxYnVoemp1b3ZzZ3VpYW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzNjExNzYsImV4cCI6MjA4NDkzNzE3Nn0.pKM9-nX2bj4OidHfxtHtc2r1Ze1JCJhQZKiYRNPspxo';
 
-let supabase = null;
+let unmaskunmaskSupabase = null;
 function initSupabase() {
   if (window.supabase && !supabase) {
     console.log('Supabase library detected, initializing client...');
-    supabase = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+    unmaskSupabase = window.unmaskSupabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
     return true;
   }
-  return !!supabase;
+  return !!unmaskSupabase;
 }
 
 // Try to initialize immediately
@@ -294,7 +294,7 @@ function initAll() {
 
   // Update version tag
   const versionTag = document.querySelector('.footer-column p[style*="font-size: 10px"]');
-  if (versionTag) versionTag.textContent = 'Build v1.1.2-final-force';
+  if (versionTag) versionTag.textContent = 'Build v1.1.4-ultimate-fix';
 }
 
 if (document.readyState === 'loading') {
@@ -371,10 +371,10 @@ async function initExtensionIntegration() {
   }
 
   // 1. Try to fetch from Supabase if logged in on website
-  if (supabase) {
-    const { data: { session } } = await supabase.auth.getSession();
+  if (unmaskSupabase) {
+    const { data: { session } } = await unmaskSupabase.auth.getSession();
     if (session) {
-      console.log('User logged in on website, fetching from Supabase...');
+      console.log('User logged in on website, fetching from unmaskSupabase...');
       syncStatus.innerHTML = '<div class="sync-spinner"></div><span>Syncing from cloud...</span>';
       
       try {
@@ -414,10 +414,10 @@ async function initExtensionIntegration() {
 }
 
 async function fetchDataFromSupabase() {
-  if (!supabase) return null;
+  if (!unmaskSupabase) return null;
 
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await unmaskSupabase.auth.getUser();
     if (!user) return null;
 
     // Join user_analyses -> hotel_analyses
@@ -472,7 +472,7 @@ function initAuthUI() {
   updateAccountUI(null);
 
   // Update on auth change
-  supabase.auth.onAuthStateChange((event, session) => {
+  unmaskSupabase.auth.onAuthStateChange((event, session) => {
     console.log(`Auth state change event: ${event}`);
     updateAccountUI(session?.user);
 
@@ -488,7 +488,7 @@ function initAuthUI() {
     console.warn('initAuthUI: getUser() timed out after 3s');
   }, 3000);
 
-  supabase.auth.getUser().then(({ data: { user } }) => {
+  unmaskSupabase.auth.getUser().then(({ data: { user } }) => {
     clearTimeout(authTimeout);
     console.log('initAuthUI: getUser() returned:', user ? 'User found' : 'No user');
     updateAccountUI(user);
@@ -549,7 +549,7 @@ function updateAccountUI(user) {
       signoutBtn.onclick = (e) => {
         e.stopPropagation();
         if (confirm('Sign out from Unmask?')) {
-          supabase.auth.signOut().then(() => {
+          unmaskSupabase.auth.signOut().then(() => {
             location.reload();
           });
         }
@@ -587,7 +587,7 @@ function updateAccountUI(user) {
     if (signinBtn) {
       signinBtn.onclick = (e) => {
         e.preventDefault();
-        supabase.auth.signInWithOAuth({
+        unmaskSupabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
             redirectTo: window.location.origin + window.location.pathname
